@@ -4,40 +4,28 @@ module Main
   ( main
   ) where
 
+import Network.CGI (CGI, CGIResult, runCGI, handleErrors, output)
 import System.IO (hFlush, stdout)
 import System.Process (readProcess)
-import Network.HTTP
 
-
-siteURL = "http://sytyc.dev"
+------------------------------------------------------------------
+-- Constants
+dir = "./test/"
+src = "hs.hs"
 test = "Mrraa!"
 
-
-main :: IO ()
-main = do
-  -- Prints header
-  putStrLn "Content-type: text/html\n"
-  hFlush stdout
-  
-  -- Runs the program
-  putStrLn "Original Input:"
-  putStrLn test
-  
-  let directory = "./test/"
-  output <- runProgram "runhaskell" [directory ++ "hs.hs"] test
-  
-  putStrLn "Program output:"
-  putStrLn output
-  
-  
+------------------------------------------------------------------
+-- Running an external program via a new process
 runProgram :: String -> [String] -> String -> IO String
 runProgram program args input = do
   readProcess program args input
   
+runhaskell :: String -> IO String
+runhaskell = runProgram "runhaskell" [dir ++ src]
   
-buildRequestBody :: [String] -> String
-buildRequestBody [] = ""
-buildRequestBody (name:info:s) = buildRequestBody' s ("\"" ++ name ++ "\": \"" ++ info ++ "\"")
-  where
-    buildRequestBody' [] output = "{" ++ output ++ "}"
-    buildRequestBody' (name:info:s) output = buildRequestBody' s (output ++ ", \"" ++ name ++ "\": \"" ++ info ++ "\"")
+------------------------------------------------------------------
+-- Entry functions
+main :: IO ()
+main = do
+  result <- runhaskell test
+  runCGI (handleErrors $ output result)
