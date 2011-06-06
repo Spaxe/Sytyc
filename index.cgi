@@ -4,8 +4,8 @@ module Main
   ( main
   ) where
 
-import Network.CGI (CGI, CGIResult, runCGI, handleErrors, output)
-import System.IO (hFlush, stdout)
+import Network.CGI (CGI, CGIResult, runCGI, handleErrors, output, setHeader)
+import System.IO (hFlush, stdout, openFile, ReadMode)
 import System.Process (readProcess)
 
 ------------------------------------------------------------------
@@ -13,19 +13,24 @@ import System.Process (readProcess)
 dir = "./test/"
 src = "hs.hs"
 test = "Mrraa!"
+runhaskell = "runhaskell"
 
 ------------------------------------------------------------------
--- Running an external program via a new process
-runProgram :: String -> [String] -> String -> IO String
-runProgram program args input = do
-  readProcess program args input
+-- Page Construction
+createPage :: String -> CGI CGIResult
+createPage result = do
+  -- Turns out setting the UTF-8 encoding is not easy with Network.CGI
+  -- setHeader "charset" "utf-8" 
+  output result
   
-runhaskell :: String -> IO String
-runhaskell = runProgram "runhaskell" [dir ++ src]
+parseTemplate :: String -> IO String
+parseTemplate template = do
+  file <- openFile template ReadMode
+  contents <- getContents file
   
 ------------------------------------------------------------------
 -- Entry functions
 main :: IO ()
 main = do
-  result <- runhaskell test
-  runCGI (handleErrors $ output result)
+  result <- readProcess runhaskell [dir ++ src] test
+  runCGI $ handleErrors $ createPage result
