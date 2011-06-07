@@ -8,15 +8,15 @@ module Main
 
 import Network.CGI (CGI, CGIResult, runCGI, handleErrors, output, getInput,
                     liftIO)
-import System.IO (readFile)
+import System.IO (openTempFile, hPutStr, hClose)
 import System.Process (readProcess)
+import System.Directory (removeFile)
 import Text.Pandoc.Readers.Markdown (readMarkdown)
 import Text.Pandoc.Writers.HTML (writeHtmlString)
 import Text.Pandoc.Shared (defaultWriterOptions)
 import Text.Pandoc.Parsing (defaultParserState)
 import Text.Pandoc.Templates (renderTemplate)
-import Data.Hash (hash, Hash)
-import Data.Time.Clock (getCurrentTime)
+import Data.Hash (hash, Hash, combine, asWord64)
 
 ------------------------------------------------------------------
 -- Constants
@@ -43,41 +43,27 @@ parseProblem problem = do
   file <- readFile problem
   return $ writeHtmlString defaultWriterOptions 
          $ readMarkdown defaultParserState file
-  
-------------------------------------------------------------------
--- Solution verification
-checkSolution :: String -> String -> IO String
-checkSolution compiler solution = do
-  
-  case compiler of
-    "haskell" ->
-    
-    "mash" ->
 
-runProgram :: String -> [String] -> String -> IO String
-runProgram program args input = do
-  readProcess program args input
-  
-------------------------------------------------------------------
--- Saves temporary file for compilation
--- | generateTempPath takes a string and hashes it together randomly.
-generateTempPath :: String -> String -> String -> IO String
-generateTempPath problem source = do
-  let hashProblem = hash problem
-  let hashAttempt = hash source
-  hashTime <- getCurrentTime 
-  randomNum <- getStdRandom 
-  
+-- | Runs a Haskell file
+runHaskellFile :: String -> IO String
+runHaskellFile content = do
+  (tmpName, tmpHandle) <- openTempFile "." "temp"
+  hPutStr tmpHandle content
+  hClose tmpHandle
+  s <- readProcess "runhaskell" [tmpName] []
+  removeFile tmpName
+  return s
 
 ------------------------------------------------------------------
 -- Entry functions
 cgiMain :: CGI CGIResult
 cgiMain = do
   result <- getInput "solution"
-  let r = case result of
-            Just a -> a
-            Nothing -> "No"
+  let result' = case result of
+                  Just a -> a
+                  Nothing -> ""
   problem <- liftIO $ parseProblem (problem_dir ++ problem_file)
+  r <- liftIO $ runHaskellFile result'
   let template_strings = [ ("NAME", "Sytyc - Programming Judge")
                          , ("PROBLEM", problem)
                          , ("RESULT", r)
