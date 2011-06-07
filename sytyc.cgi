@@ -6,7 +6,7 @@ module Main
   ( main
   ) where
 
-import Network.CGI (CGI, CGIResult, runCGI, handleErrors, output)
+import Network.CGI (CGI, CGIResult, runCGI, handleErrors, output, getInput)
 import System.IO (readFile)
 import System.Process (readProcess)
 import Text.Pandoc.Readers.Markdown (readMarkdown)
@@ -44,29 +44,16 @@ parseProblem problem = do
   return $ writeHtmlString defaultWriterOptions 
          $ readMarkdown defaultParserState file
   
-  
 ------------------------------------------------------------------
 -- Entry functions
 main :: IO ()
 main = do
   problem <- parseProblem (problem_dir ++ problem_file)
+  result <- getInput "solution"
   let template_strings = [ ("NAME", "Sytyc - Programming Judge")
                          , ("PROBLEM", problem)
+                         , ("RESULT", result)
                          ]
   -- result <- readProcess runhaskell [src_dir ++ src] test
   page <- parseTemplate template_strings problem_html
   runCGI $ handleErrors $ output $ page
-      
-                         
-                         
-                         
-                         
-                         
-                         
-                         
-                         
-                         
-                         
-                         
-                         
-                         

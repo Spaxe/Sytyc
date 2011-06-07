@@ -5,15 +5,15 @@
     <link href="style.css" rel="stylesheet" type="text/css">
   </head>
   <body>
+    
     <div id="content">
-      <div id="pagetitle">
-        $NAME$
+      <div id="navbar">
+        Back to Index
       </div>
-      <div id="problem">
-        $PROBLEM$
-      </div>
+      $PROBLEM$
+      $RESULT$
       <div id="form">
-        <form action="$CGIFILE$" method="post">
+        <form name="input" action="$CGIFILE$" method="post">
           <textarea rows="24" cols="80" name="solution" placeholder="Place your solution here."></textarea><br>
           <input type="submit" value="Submit" id="button" />
         </form>
