@@ -10,13 +10,13 @@ import Network.CGI (CGI, CGIResult, runCGI, handleErrors, output, getInput,
                     liftIO)
 import System.IO (readFile)
 import System.Process (readProcess)
-import System.Random (getStdRandom, getStdGen)
 import Text.Pandoc.Readers.Markdown (readMarkdown)
 import Text.Pandoc.Writers.HTML (writeHtmlString)
 import Text.Pandoc.Shared (defaultWriterOptions)
 import Text.Pandoc.Parsing (defaultParserState)
 import Text.Pandoc.Templates (renderTemplate)
 import Data.Hash (hash, Hash)
+import Data.Time.Clock (getCurrentTime)
 
 ------------------------------------------------------------------
 -- Constants
@@ -61,9 +61,12 @@ runProgram program args input = do
 ------------------------------------------------------------------
 -- Saves temporary file for compilation
 -- | generateTempPath takes a string and hashes it together randomly.
-generateTempPath :: String -> IO String
-generateTempPath s = do
-  randomNum <- getStdRandom
+generateTempPath :: String -> String -> String -> IO String
+generateTempPath problem source = do
+  let hashProblem = hash problem
+  let hashAttempt = hash source
+  hashTime <- getCurrentTime 
+  randomNum <- getStdRandom 
   
 
 ------------------------------------------------------------------
