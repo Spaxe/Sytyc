@@ -47,7 +47,7 @@ parseProblem problem = do
 -- | Runs a Haskell file
 runHaskellFile :: String -> IO String
 runHaskellFile content = do
-  (tmpName, tmpHandle) <- openTempFile "." "temp"
+  (tmpName, tmpHandle) <- openTempFile "./tmp" "temp"
   hPutStr tmpHandle content
   hClose tmpHandle
   s <- readProcess "runhaskell" [tmpName] []
