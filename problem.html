@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sytyc - Programming Judge</title>
+    <link href="style.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div id="content">
+      <div id="pagetitle">
+        Sytyc - Programming Judge
+      </div>
+      <div id="problem">
+        Problem Description<br>
+        <? PROBLEM ?>
+      </div>
+      <div id="form">
+        <form action="sytyc.cgi" method="post">
+          <textarea rows="24" cols="80" name="solution" placeholder="Place your solution here."></textarea><br>
+          <input type="submit" value="Submit" id="button" />
+        </form>
+        <? FORM ?>
+      </div>
+      <? OUTPUT ?> 
+    </div>
+  </body>
+</html>

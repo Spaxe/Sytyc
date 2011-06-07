@@ -5,32 +5,27 @@ module Main
   ) where
 
 import Network.CGI (CGI, CGIResult, runCGI, handleErrors, output, setHeader)
-import System.IO (hFlush, stdout, openFile, ReadMode)
+import System.IO (readFile)
 import System.Process (readProcess)
 
 ------------------------------------------------------------------
 -- Constants
 dir = "./test/"
 src = "hs.hs"
+html = "problem.html"
 test = "Mrraa!"
 runhaskell = "runhaskell"
 
 ------------------------------------------------------------------
 -- Page Construction
-createPage :: String -> CGI CGIResult
-createPage result = do
-  -- Turns out setting the UTF-8 encoding is not easy with Network.CGI
-  -- setHeader "charset" "utf-8" 
-  output result
-  
 parseTemplate :: String -> IO String
 parseTemplate template = do
-  file <- openFile template ReadMode
-  contents <- getContents file
+  readFile template
   
 ------------------------------------------------------------------
 -- Entry functions
 main :: IO ()
 main = do
   result <- readProcess runhaskell [dir ++ src] test
-  runCGI $ handleErrors $ createPage result
+  page <- parseTemplate html
+  runCGI $ handleErrors $ output $ page

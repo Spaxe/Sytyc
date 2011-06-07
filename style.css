@@ -51,10 +51,46 @@ table {
 body {
   font-family: Helvetica, Arial, Sens-Serif;
   font-size: 16px;
+  background: #fdf6e3;
+  color: #657b83;
 }
 
 #content {
   margin: 0 auto;
-  width: 960px;
-  background-color: #CCC
+  margin-top: 50px;
+  width: 780px;
+  background-color: #eee8d5;
+  padding: 10px;
+}
+
+#pagetitle {
+  font-size: 24px;
+  font-weight: bold;
+  padding: 15px 0;
+}
+
+#problem {
+  margin-top: 10px;
+}
+
+#form {
+  text-align: center;
+  margin-top: 20px;
+}
+
+#form textarea {
+  background: #fdf6e3;
+  border: 1px solid #93a1a1;
+  color: #657b83;
+  width: 750px;
+}
+
+#button {
+  font-size: 16px;
+  background: #fdf6e3;
+  color: #657b83;
+  border: 1px solid #93a1a1;
+  padding: 5px 10px;
+  font-weight: bold;
+  border-radius: 5px;
 }
