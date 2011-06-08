@@ -7,25 +7,30 @@ $NAME$
     <link href="style.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    
-    <div id="content">
+    <div id="wrapper">
       <div id="navbar">
         <ul>
-          <li>Home</li>
-          <li>Problems</li>
-          <li>FAQ</li>
-          <li>Feedback</li>
+          <a href="#"><li>Home</li></a>
+          <a href="#"><li>Problems</li></a>
+          <a href="#"><li>FAQ</li></a>
+          <a href="#"><li>Feedback</li></a>
         </ul>
       </div>
+      <div id="content">
 $PROBLEM$
 $RESULT_TEMPLATE$
-      <div id="form">
-        <form name="input" action="sytyc.cgi" method="post">
-          <textarea rows="24" cols="80" name="solution" placeholder="Place your solution here.">
+        <div id="form">
+          <form name="input" action="sytyc.cgi" method="post">
+            <textarea rows="24" cols="80" name="solution" placeholder="Place your solution here.">
 $SOURCE_CODE$
-          </textarea><br>
-          <input type="submit" value="Submit" id="button" />
-        </form>
+            </textarea><br>
+            <input type="submit" value="Submit" id="button" />
+          </form>
+        </div>
+      </div>
+      <div id="footer">
+        <img src="images/CC_by-sa_80x15.png" />
+        <div id="version">Sytyc v1.0</div>
       </div>
     </div>
   </body>
