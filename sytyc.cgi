@@ -94,43 +94,69 @@ nToBR = replace "\n" "<br>"
   
 ------------------------------------------------------------------
 -- External process execution
--- | Runs a Haskell file in a temporary dump
+-- Unfortunately it's not exactly unified.
+-- 
+-- Edit this section with care. Chances are, more things break if changed.
+
+
+-- Haskell
 runghc :: String -> IO String
-runghc content = do
+runghc source = do
   createDirectoryIfMissing False tmp_dir
-  
-  (tmpName, tmpHandle) <- openTempFile tmp_dir "temp"
-  hPutStr tmpHandle content
+  (tmpName, tmpHandle) <- openTempFile tmp_dir "Main.hs"
+  hPutStr tmpHandle source
   hClose tmpHandle
   (exitcode, out_msg, err_msg) <- readProcessWithExitCode
                                      "runghc" [tmpName] []
-                                     
-  let stdout_msg = case out_msg of
-                     "" -> ""
-                     _  -> "Program output:\n" ++ out_msg
-                     
-  let stderr_msg = case err_msg of
-                     "" -> ""
-                     _  -> err_msg
-                     
-  let failure_msg = replace (tmpName ++ ":") ""
-                    $ nToBR ((show exitcode)
-                           ++ "\n"
-                           ++ stdout_msg
-                           ++ stderr_msg)
-                     
   let msg = case exitcode of
               ExitSuccess -> out_msg
               ExitFailure code -> failure_msg
-                                     
+                where 
+                  failure_msg = replace (tmpName ++ ":") ""
+                                $ nToBR ((show exitcode)
+                                         ++ "\n"
+                                         ++ out_msg
+                                         ++ "\n"
+                                         ++ err_msg)                                               
   removeDirectoryRecursive tmp_dir
   return msg
   
+-- Java
+runJava :: String -> IO String
+runJava source = do
+  createDirectoryIfMissing False tmp_dir
+  (tmpName, tmpHandle) <- openTempFile tmp_dir "Main.java"
+  let className = replace "tmp\\" "" 
+                $ replace "tmp/" "" 
+                $ replace ".java" ""
+                  tmpName
+  let bytecodeName = replace ".java" ".class" tmpName
+  -- Hacky stuff. Could be improved.
+  let source' = replace "class Main" ("class " ++ className) source
+  hPutStr tmpHandle source'
+  hClose tmpHandle
+  -- putStrLn tmpName
+  (exitcode, out_msg, err_msg) <- readProcessWithExitCode
+                                     "javac" [tmpName] []
+  (exitcode', out_msg', err_msg') <- readProcessWithExitCode
+                                     "java" [bytecodeName] []
+  let msg = case (exitcode, exitcode') of
+              (_, ExitSuccess) -> out_msg'
+              (ExitFailure code, _) -> compiler_error
+                where
+                  compiler_error = replace (tmpName ++ ":") ""
+                                  $ nToBR ((show exitcode)
+                                           ++ "\n"
+                                           ++ out_msg
+                                           ++ "\n"
+                                           ++ err_msg)  
+              (_, _) -> runtime_error
+                where 
+                  runtime_error = nToBR $ out_msg' ++ "\n" ++ err_msg'
+      
+  removeDirectoryRecursive tmp_dir
+  return msg
 
-runMash :: String -> IO String
-runMash content = do
-  return ""
-  
 ------------------------------------------------------------------
 -- Entry functions
 cgiMain :: CGI CGIResult
@@ -139,7 +165,7 @@ cgiMain = do
   let r' = case r of
              Just a -> a
              Nothing -> ""
-  result <- liftIO $ runghc r'
+  result <- liftIO $ runJava r'
   
   result_partial <- liftIO $ parseResultTemplate result
   problem_partial <- liftIO $ parseProblemTemplate problem_file
