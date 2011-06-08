@@ -62,6 +62,7 @@ body {
 #content {
   margin: 0 auto;
   margin-top: 50px;
+  margin-bottom: 50px;
   width: 780px;
   background-color: #eee8d5;
   padding: 10px;
