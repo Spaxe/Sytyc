@@ -1,98 +1,23 @@
 #!runghc
--- See README.md for an overview.
 
-module Main
-  ( main
-  ) where
+module Main (main) where
 
-import Prelude hiding (catch)
 import Control.DeepSeq (rnf)
-import Control.Exception (IOException, catch)
+
 import System.IO (openTempFile, hPutStr, hClose, FilePath, hGetContents)
 import System.Process (readProcessWithExitCode, createProcess, waitForProcess,
                        proc, CreateProcess(..), StdStream(..))
 import System.Directory (removeFile, createDirectoryIfMissing, 
                          removeDirectoryRecursive)
 import System.Exit (ExitCode(..))
-import Data.String.Utils (replace)
 import Network.CGI (CGI, CGIResult, runCGI, handleErrors, output, getInput,
                     liftIO)
-import Text.Pandoc.Readers.Markdown (readMarkdown)
-import Text.Pandoc.Writers.HTML (writeHtmlString)
-import Text.Pandoc.Shared (defaultWriterOptions)
-import Text.Pandoc.Parsing (defaultParserState)
-import Text.Pandoc.Templates (renderTemplate)
-
+import Data.String.Utils (replace)
+import Sytyc
+  
 ------------------------------------------------------------------
 -- Constants
-src_dir = "./test/"
-problem_dir = "./problems/"
-template_dir = "./templates/"
-tmp_dir = "tmp" -- Do NOT add the slash at the end!
-
-supported_languages = [ "haskell"
-                      , "java"
-                      ]
-                      
-result_file = "result.md"
-
-template_html = "template.html"
-problem_html = "problem.html"
 problem_file = "001_Summation-of-Integers.md"
-
-------------------------------------------------------------------
--- Page Construction
--- | A shorthand because I get them confused otherwise.
-parseTemplate = renderTemplate
-
-
--- | Generic exception handling for reading a file.
-exReadFile :: FilePath -> IO String
-exReadFile f = 
-  catch (readFile f)
-        (\e -> return 
-               $ nToBR 
-               $ "readFile failed: " 
-              ++ show (e :: IOException)
-              ++ "\n\nPlease contact the admin about this error." )
-                                   
-
--- | Takes a dictionary pairs of mapping (a, b) from a to b, and a
--- | file to be opened for parsing. Returns the template with the variables
--- | substituted. Variables should be wrapped with $ signs, like $this$.
--- | For more information, consult pandoc's renderTemplate documentation.
-parseTemplateFile :: [(String, String)] -> String -> IO String
-parseTemplateFile template_strings template = do
-  t <- exReadFile template
-  return $ parseTemplate template_strings t
-  
-  
--- | Takes a markdown template, and outputs HTML.
-parseMarkdownFile :: String -> IO String
-parseMarkdownFile mdFile = do
-  file <- exReadFile mdFile
-  return $ writeHtmlString defaultWriterOptions 
-         $ readMarkdown defaultParserState file
-         
-
--- | Takes the program feedback and put it into the result template in HTML.
--- | If the result is empty, the result HTML is also empty.
-parseResultTemplate :: String -> IO String
-parseResultTemplate result
-  | result == "" = return ""
-  | otherwise    = do
-      template <- parseMarkdownFile (template_dir ++ result_file)
-      return $ parseTemplate [("RESULT", result)] template
-  
-  
--- | Takes a problem name (filename) and returns the HTML.
-parseProblemTemplate :: String -> IO String
-parseProblemTemplate file = parseMarkdownFile (problem_dir ++ file)
-
-
--- | Takes a string and replaces all newline characters \n with <br>.
-nToBR :: String -> String
-nToBR = replace "\n" "<br>"
   
 ------------------------------------------------------------------
 -- External process execution
@@ -118,7 +43,7 @@ runghc source = do
                                          ++ "\n"
                                          ++ out_msg
                                          ++ "\n"
-                                         ++ err_msg)                                               
+                                         ++ err_msg)      
   removeDirectoryRecursive tmp_dir
   return msg
   
@@ -204,11 +129,12 @@ cgiMain = do
               _         -> return ""
   
   result_partial <- liftIO $ parseResultTemplate result
-  problem_partial <- liftIO $ parseProblemTemplate problem_file
+  problem_partial <- liftIO $ parseMarkdownFile $ problem_dir ++ problem_file
   template <- liftIO $ exReadFile template_html
   this_page <- liftIO $ exReadFile problem_html
   let page = parseTemplate [("TEMPLATE_CONTENT", this_page)] template
-  let template_strings = [ ("NAME", "Sytyc - Programming Judge")
+  let template_strings = [ ("NAME", prog_name)
+                         , ("VERSION", footer)
                          , ("PROBLEM", problem_partial)
                          , ("RESULT_TEMPLATE", result_partial)
                          , ("SOURCE_CODE", r')

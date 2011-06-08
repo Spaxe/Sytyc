@@ -57,7 +57,7 @@ body {
 
 a, a:visited, a:active {
   text-decoration: none;
-  color: #93a1a1;;
+  color: #93a1a1;
 }
 
 a:hover {
@@ -92,6 +92,7 @@ a:hover {
   padding: 10px;
   position: relative;
   float: left;
+  width: 780px;
 }
 
 #content h1 {
@@ -160,6 +161,7 @@ a:hover {
   font-size: 12px;
   font-family: monospace;
   vertical-align: center;
-  width: 775px;
+  width: 780px;
   text-align: right;
+  color: #93a1a1;
 }
