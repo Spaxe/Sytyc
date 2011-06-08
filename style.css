@@ -55,8 +55,18 @@ body {
   color: #657b83;
 }
 
+a {
+
+}
+
 #navbar {
+  margin-top: 5px;
   width: 780px;
+}
+
+#navbar li {
+  display: inline;
+  padding: 0 15px;
 }
 
 #content {
