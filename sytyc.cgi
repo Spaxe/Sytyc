@@ -92,10 +92,11 @@ parseProblemTemplate file = parseMarkdownFile (problem_dir ++ file)
 nToBR :: String -> String
 nToBR = replace "\n" "<br>"
   
-  
+------------------------------------------------------------------
+-- External process execution
 -- | Runs a Haskell file in a temporary dump
-runghcFile :: String -> IO String
-runghcFile content = do
+runghc :: String -> IO String
+runghc content = do
   createDirectoryIfMissing False tmp_dir
   
   (tmpName, tmpHandle) <- openTempFile tmp_dir "temp"
@@ -125,6 +126,11 @@ runghcFile content = do
   removeDirectoryRecursive tmp_dir
   return msg
   
+
+runMash :: String -> IO String
+runMash content = do
+  return ""
+  
 ------------------------------------------------------------------
 -- Entry functions
 cgiMain :: CGI CGIResult
@@ -133,7 +139,7 @@ cgiMain = do
   let r' = case r of
              Just a -> a
              Nothing -> ""
-  result <- liftIO $ runghcFile r'
+  result <- liftIO $ runghc r'
   
   result_partial <- liftIO $ parseResultTemplate result
   problem_partial <- liftIO $ parseProblemTemplate problem_file
