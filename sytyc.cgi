@@ -6,8 +6,8 @@ module Main
   ) where
 
 import Prelude hiding (catch)
+import Control.DeepSeq (rnf)
 import Control.Exception (IOException, catch)
-
 import System.IO (openTempFile, hPutStr, hClose, FilePath, hGetContents)
 import System.Process (readProcessWithExitCode, createProcess, waitForProcess,
                        proc, CreateProcess(..), StdStream(..))
@@ -154,35 +154,35 @@ runJava source = do
                   , std_err = CreatePipe
                   , std_out = CreatePipe
                   }
-  hClose hin
-  exitcode' <- waitForProcess hJava
+  hClose hin -- TODO: add stdin based on problem
   out_msg' <- hGetContents hout
   err_msg' <- hGetContents herr
-  hClose hout
-  hClose herr
-  -- (exitcode', out_msg', err_msg') <- readProcessWithExitCode
-  --                                   "java" [ "-cp" ++ tmp_dir
-  --                                          , className] []
+  -- Here we _force_ the file to be read.
+  -- Dark magic of Haskell
+  rnf out_msg' `seq` hClose hout
+  rnf err_msg' `seq` hClose herr
+  let out_msg'' = replace className "Main" out_msg'
+  let err_msg'' = replace className "Main" err_msg'
+  exitcode' <- waitForProcess hJava
   let msg = case (exitcode, exitcode') of
-              (_, ExitSuccess) -> "Program works! Woot." ++ out_msg'
-              -- (ExitSuccess, _) -> "Mrraa"
               (ExitFailure code, _) -> compiler_error
                 where
                   compiler_error = replace (tmpName ++ ":") "Line "
-                                  $ nToBR ("Compilation failed with " 
-                                           ++ (show exitcode)
-                                           ++ "\n"
-                                           ++ out_msg
+                                  $ nToBR $ -- "Compilation failed with " 
+                                           -- ++ (show exitcode)
+                                           -- ++ "\n"
+                                           out_msg
                                            ++ "\n"
                                            ++ err_msg
-                                          ) 
-              (_, _) -> runtime_msg
+              (ExitSuccess, ExitFailure code) -> runtime_msg
                 where 
-                  runtime_msg = nToBR $ "Runtime Error!\n"
-                                      ++ out_msg' 
+                  runtime_msg = nToBR $ -- "Execution failed with "
+                                      -- ++ (show exitcode)
+                                      -- ++ "\n"
+                                      out_msg''
                                       ++ "\n" 
-                                      ++ err_msg' 
-      
+                                      ++ err_msg''
+              (_, _) -> out_msg''
   removeDirectoryRecursive tmp_dir
   return msg
 
@@ -202,6 +202,7 @@ cgiMain = do
   let template_strings = [ ("NAME", "Sytyc - Programming Judge")
                          , ("PROBLEM", problem_partial)
                          , ("RESULT_TEMPLATE", result_partial)
+                         , ("SOURCE_CODE", r')
                          ]
   page <- liftIO $ parseTemplateFile template_strings problem_html
   output page

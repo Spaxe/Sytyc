@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>$NAME$</title>
+    <title>
+$NAME$
+    </title>
     <link href="style.css" rel="stylesheet" type="text/css">
   </head>
   <body>
@@ -10,11 +12,13 @@
       <div id="navbar">
         Back to Index
       </div>
-      $PROBLEM$
-      $RESULT_TEMPLATE$
+$PROBLEM$
+$RESULT_TEMPLATE$
       <div id="form">
-        <form name="input" action="$CGIFILE$" method="post">
-          <textarea rows="24" cols="80" name="solution" placeholder="Place your solution here.">$SOURCE_CODE$</textarea><br>
+        <form name="input" action="sytyc.cgi" method="post">
+          <textarea rows="24" cols="80" name="solution" placeholder="Place your solution here.">
+$SOURCE_CODE$
+          </textarea><br>
           <input type="submit" value="Submit" id="button" />
         </form>
       </div>

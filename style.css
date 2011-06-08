@@ -89,6 +89,8 @@ body {
   display: block;
   /* background-color: #fdf6e3; */
   width: 720px;
+  text-wrap: normal;
+  word-wrap: break-word;
 }
 
 #content p {
