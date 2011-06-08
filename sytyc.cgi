@@ -8,8 +8,9 @@ module Main
 import Prelude hiding (catch)
 import Control.Exception (IOException, catch)
 
-import System.IO (openTempFile, hPutStr, hClose, FilePath)
-import System.Process (readProcessWithExitCode)
+import System.IO (openTempFile, hPutStr, hClose, FilePath, hGetContents)
+import System.Process (readProcessWithExitCode, createProcess, waitForProcess,
+                       proc, CreateProcess(..), StdStream(..))
 import System.Directory (removeFile, createDirectoryIfMissing, 
                          removeDirectoryRecursive)
 import System.Exit (ExitCode(..))
@@ -122,7 +123,11 @@ runghc source = do
   return msg
   
 -- Java
+-- The source code must have "public class Main".
+-- Pain in the ass.
 runJava :: String -> IO String
+-- Java does not generate .class files if the source is empty. Annoying.
+runJava "" = return ""
 runJava source = do
   createDirectoryIfMissing False tmp_dir
   (tmpName, tmpHandle) <- openTempFile tmp_dir "Main.java"
@@ -130,18 +135,38 @@ runJava source = do
                 $ replace "tmp/" "" 
                 $ replace ".java" ""
                   tmpName
-  let bytecodeName = replace ".java" ".class" tmpName
   -- Hacky stuff. Could be improved.
   let source' = replace "class Main" ("class " ++ className) source
   hPutStr tmpHandle source'
   hClose tmpHandle
-  -- putStrLn tmpName
+
+  -- Javac doesn't return ExitFailure with code. 
   (exitcode, out_msg, err_msg) <- readProcessWithExitCode
-                                     "javac" [tmpName] []
-  (exitcode', out_msg', err_msg') <- readProcessWithExitCode
-                                     "java" [bytecodeName] []
+                                  "javac" [tmpName] []
+  
+  -- Java is annoying in the way that, you must somehow pass the path
+  -- of the class file before it can run the class name. And its -cp flag
+  -- doesn't work with the System.Process flags. We resort back to raw
+  -- system command with changed working directory.
+  (Just hin, Just hout, Just herr, hJava) <-
+    createProcess (proc "java" [className])
+                  { cwd = Just tmp_dir
+                  , std_in = CreatePipe
+                  , std_err = CreatePipe
+                  , std_out = CreatePipe
+                  }
+  exitcode' <- waitForProcess hJava
+  out_msg' <- hGetContents hout
+  err_msg' <- hGetContents herr
+  hClose hin
+  hClose hout
+  hClose herr
+  -- (exitcode', out_msg', err_msg') <- readProcessWithExitCode
+  --                                   "java" [ "-cp" ++ tmp_dir
+  --                                          , className] []
   let msg = case (exitcode, exitcode') of
-              (_, ExitSuccess) -> out_msg'
+              (_, ExitSuccess) -> out_msg
+              -- (ExitSuccess, _) -> "Mrraa"
               (ExitFailure code, _) -> compiler_error
                 where
                   compiler_error = replace (tmpName ++ ":") ""
@@ -149,10 +174,13 @@ runJava source = do
                                            ++ "\n"
                                            ++ out_msg
                                            ++ "\n"
-                                           ++ err_msg)  
-              (_, _) -> runtime_error
+                                           ++ err_msg
+                                          ) 
+              (_, _) -> runtime_msg
                 where 
-                  runtime_error = nToBR $ out_msg' ++ "\n" ++ err_msg'
+                  runtime_msg = nToBR $ out_msg' 
+                                      ++ "\n" 
+                                      ++ err_msg' 
       
   removeDirectoryRecursive tmp_dir
   return msg
