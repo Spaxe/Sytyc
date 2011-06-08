@@ -90,6 +90,7 @@ a:hover {
 #content {
   background-color: #eee8d5;
   padding: 10px;
+  padding-bottom: 20px;
   position: relative;
   float: left;
   width: 780px;
