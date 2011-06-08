@@ -1,76 +1,211 @@
-#!runhaskell
-
--- This file requires GHC version >= 7.0.3
+#!runghc
+-- See README.md for an overview.
 
 module Main
   ( main
   ) where
 
+import Prelude hiding (catch)
+import Control.Exception (IOException, catch)
+
+import System.IO (openTempFile, hPutStr, hClose, FilePath, hGetContents)
+import System.Process (readProcessWithExitCode, createProcess, waitForProcess,
+                       proc, CreateProcess(..), StdStream(..))
+import System.Directory (removeFile, createDirectoryIfMissing, 
+                         removeDirectoryRecursive)
+import System.Exit (ExitCode(..))
+import Data.String.Utils (replace)
 import Network.CGI (CGI, CGIResult, runCGI, handleErrors, output, getInput,
                     liftIO)
-import System.IO (openTempFile, hPutStr, hClose)
-import System.Process (readProcess)
-import System.Directory (removeFile)
 import Text.Pandoc.Readers.Markdown (readMarkdown)
 import Text.Pandoc.Writers.HTML (writeHtmlString)
 import Text.Pandoc.Shared (defaultWriterOptions)
 import Text.Pandoc.Parsing (defaultParserState)
 import Text.Pandoc.Templates (renderTemplate)
-import Data.Hash (hash, Hash, combine, asWord64)
 
 ------------------------------------------------------------------
 -- Constants
-
 src_dir = "./test/"
-src = "hs.hs"
+problem_dir = "./problems/"
+template_dir = "./templates/"
+tmp_dir = "tmp" -- Do NOT add the slash at the end!
+
+supported_languages = [ "haskell"
+                      , "java"
+                      ]
+                      
+result_file = "result.md"
 
 problem_html = "problem.html"
 problem_file = "001_Summation-of-Integers.md"
-problem_dir = "./problems/"
 
 ------------------------------------------------------------------
 -- Page Construction
--- | parseTemplate takes a HTML file with Pandoc template styles, and replaces
--- | the variables in between $ $ with template_strings.
-parseTemplate :: [(String, String)] -> String -> IO String
-parseTemplate template_strings template = do
-  t <- readFile template
-  return $ renderTemplate template_strings t
+-- | A shorthand because I get them confused otherwise.
+parseTemplate = renderTemplate
+
+
+-- | Generic exception handling for reading a file.
+exReadFile :: FilePath -> IO String
+exReadFile f = 
+  catch (readFile f)
+        (\e -> return 
+               $ nToBR 
+               $ "readFile failed: " 
+              ++ show (e :: IOException)
+              ++ "\n\nPlease contact the admin about this error." )
+                                   
+
+-- | Takes a dictionary pairs of mapping (a, b) from a to b, and a
+-- | file to be opened for parsing. Returns the template with the variables
+-- | substituted. Variables should be wrapped with $ signs, like $this$.
+-- | For more information, consult pandoc's renderTemplate documentation.
+parseTemplateFile :: [(String, String)] -> String -> IO String
+parseTemplateFile template_strings template = do
+  t <- exReadFile template
+  return $ parseTemplate template_strings t
   
--- | parseProblem takes a markdown template, and outputs HTML.
-parseProblem :: String -> IO String
-parseProblem problem = do
-  file <- readFile problem
+  
+-- | Takes a markdown template, and outputs HTML.
+parseMarkdownFile :: String -> IO String
+parseMarkdownFile mdFile = do
+  file <- exReadFile mdFile
   return $ writeHtmlString defaultWriterOptions 
          $ readMarkdown defaultParserState file
+         
 
--- | Runs a Haskell file
-runHaskellFile :: String -> IO String
-runHaskellFile content = do
-  (tmpName, tmpHandle) <- openTempFile "./tmp" "temp"
-  hPutStr tmpHandle content
+-- | Takes the program feedback and put it into the result template in HTML.
+-- | If the result is empty, the result HTML is also empty.
+parseResultTemplate :: String -> IO String
+parseResultTemplate result
+  | result == "" = return ""
+  | otherwise    = do
+      template <- parseMarkdownFile (template_dir ++ result_file)
+      return $ parseTemplate [("RESULT", result)] template
+  
+  
+-- | Takes a problem name (filename) and returns the HTML.
+parseProblemTemplate :: String -> IO String
+parseProblemTemplate file = parseMarkdownFile (problem_dir ++ file)
+
+
+-- | Takes a string and replaces all newline characters \n with <br>.
+nToBR :: String -> String
+nToBR = replace "\n" "<br>"
+  
+------------------------------------------------------------------
+-- External process execution
+-- Unfortunately it's not exactly unified.
+-- 
+-- Edit this section with care. Chances are, more things break if changed.
+
+
+-- Haskell
+runghc :: String -> IO String
+runghc source = do
+  createDirectoryIfMissing False tmp_dir
+  (tmpName, tmpHandle) <- openTempFile tmp_dir "Main.hs"
+  hPutStr tmpHandle source
   hClose tmpHandle
-  s <- readProcess "runhaskell" [tmpName] []
-  removeFile tmpName
-  return s
+  (exitcode, out_msg, err_msg) <- readProcessWithExitCode
+                                     "runghc" [tmpName] []
+  let msg = case exitcode of
+              ExitSuccess -> out_msg
+              ExitFailure code -> failure_msg
+                where 
+                  failure_msg = replace (tmpName ++ ":") ""
+                                $ nToBR ((show exitcode)
+                                         ++ "\n"
+                                         ++ out_msg
+                                         ++ "\n"
+                                         ++ err_msg)                                               
+  removeDirectoryRecursive tmp_dir
+  return msg
+  
+-- Java
+-- The source code must have "public class Main".
+-- Pain in the ass.
+runJava :: String -> IO String
+-- Java does not generate .class files if the source is empty. Annoying.
+runJava "" = return ""
+runJava source = do
+  createDirectoryIfMissing False tmp_dir
+  (tmpName, tmpHandle) <- openTempFile tmp_dir "Main.java"
+  let className = replace "tmp\\" "" 
+                $ replace "tmp/" "" 
+                $ replace ".java" ""
+                  tmpName
+  -- Hacky stuff. Could be improved.
+  let source' = replace "class Main" ("class " ++ className) source
+  hPutStr tmpHandle source'
+  hClose tmpHandle
+
+  -- Javac doesn't return ExitFailure with code. 
+  (exitcode, out_msg, err_msg) <- readProcessWithExitCode
+                                  "javac" [tmpName] []
+  
+  -- Java is annoying in the way that, you must somehow pass the path
+  -- of the class file before it can run the class name. And its -cp flag
+  -- doesn't work with the System.Process flags. We resort back to raw
+  -- system command with changed working directory.
+  (Just hin, Just hout, Just herr, hJava) <-
+    createProcess (proc "java" [className])
+                  { cwd = Just tmp_dir
+                  , std_in = CreatePipe
+                  , std_err = CreatePipe
+                  , std_out = CreatePipe
+                  }
+  exitcode' <- waitForProcess hJava
+  out_msg' <- hGetContents hout
+  err_msg' <- hGetContents herr
+  hClose hin
+  hClose hout
+  hClose herr
+  -- (exitcode', out_msg', err_msg') <- readProcessWithExitCode
+  --                                   "java" [ "-cp" ++ tmp_dir
+  --                                          , className] []
+  let msg = case (exitcode, exitcode') of
+              (_, ExitSuccess) -> out_msg
+              -- (ExitSuccess, _) -> "Mrraa"
+              (ExitFailure code, _) -> compiler_error
+                where
+                  compiler_error = replace (tmpName ++ ":") ""
+                                  $ nToBR ((show exitcode)
+                                           ++ "\n"
+                                           ++ out_msg
+                                           ++ "\n"
+                                           ++ err_msg
+                                          ) 
+              (_, _) -> runtime_msg
+                where 
+                  runtime_msg = nToBR $ out_msg' 
+                                      ++ "\n" 
+                                      ++ err_msg' 
+      
+  removeDirectoryRecursive tmp_dir
+  return msg
 
 ------------------------------------------------------------------
 -- Entry functions
 cgiMain :: CGI CGIResult
 cgiMain = do
-  result <- getInput "solution"
-  let result' = case result of
-                  Just a -> a
-                  Nothing -> ""
-  problem <- liftIO $ parseProblem (problem_dir ++ problem_file)
-  r <- liftIO $ runHaskellFile result'
+  r <- getInput "solution"
+  let r' = case r of
+             Just a -> a
+             Nothing -> ""
+  result <- liftIO $ runJava r'
+  
+  result_partial <- liftIO $ parseResultTemplate result
+  problem_partial <- liftIO $ parseProblemTemplate problem_file
+  
   let template_strings = [ ("NAME", "Sytyc - Programming Judge")
-                         , ("PROBLEM", problem)
-                         , ("RESULT", r)
+                         , ("PROBLEM", problem_partial)
+                         , ("RESULT_TEMPLATE", result_partial)
                          ]
-  page <- liftIO $ parseTemplate template_strings problem_html
+  page <- liftIO $ parseTemplateFile template_strings problem_html
   output page
 
+  
 main :: IO ()
 main = do
   runCGI $ handleErrors cgiMain
