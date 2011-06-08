@@ -9,8 +9,11 @@ import Prelude hiding (catch)
 import Control.Exception (IOException, catch)
 
 import System.IO (openTempFile, hPutStr, hClose, FilePath)
-import System.Process (readProcess)
-import System.Directory (removeFile, getDirectoryContents)
+import System.Process (readProcessWithExitCode)
+import System.Directory (removeFile, createDirectoryIfMissing, 
+                         removeDirectoryRecursive)
+import System.Exit (ExitCode(..))
+import Data.String.Utils (replace)
 import Network.CGI (CGI, CGIResult, runCGI, handleErrors, output, getInput,
                     liftIO)
 import Text.Pandoc.Readers.Markdown (readMarkdown)
@@ -24,8 +27,12 @@ import Text.Pandoc.Templates (renderTemplate)
 src_dir = "./test/"
 problem_dir = "./problems/"
 template_dir = "./templates/"
-tmp_dir = "./tmp" -- Do NOT add the slash at the end!
+tmp_dir = "tmp" -- Do NOT add the slash at the end!
 
+supported_languages = [ "haskell"
+                      , "java"
+                      ]
+                      
 result_file = "result.md"
 
 problem_html = "problem.html"
@@ -41,19 +48,12 @@ parseTemplate = renderTemplate
 exReadFile :: FilePath -> IO String
 exReadFile f = 
   catch (readFile f)
-        (\e -> return $ "readFile failed: " 
-                     ++ show (e :: IOException))
+        (\e -> return 
+               $ nToBR 
+               $ "readFile failed: " 
+              ++ show (e :: IOException)
+              ++ "\n\nPlease contact the admin about this error." )
                                    
-                                   
--- | Generic exception handling for executing an external program
-{-
-exReadProcess :: FilePath -> [String] -> String -> IO String
-exReadProcess executable args input = 
-  catch (\try -> do
-          msg <- readProcess executable args input
-          return msg)
-        (readProcess executable args input)
--}
 
 -- | Takes a dictionary pairs of mapping (a, b) from a to b, and a
 -- | file to be opened for parsing. Returns the template with the variables
@@ -86,21 +86,43 @@ parseResultTemplate result
 -- | Takes a problem name (filename) and returns the HTML.
 parseProblemTemplate :: String -> IO String
 parseProblemTemplate file = parseMarkdownFile (problem_dir ++ file)
+
+
+-- | Takes a string and replaces all newline characters \n with <br>.
+nToBR :: String -> String
+nToBR = replace "\n" "<br>"
   
   
--- | Runs a Haskell file
+-- | Runs a Haskell file in a temporary dump
 runghcFile :: String -> IO String
 runghcFile content = do
-  createDirectoryIfMissing false tmp_dir
+  createDirectoryIfMissing False tmp_dir
   
   (tmpName, tmpHandle) <- openTempFile tmp_dir "temp"
-  putStrLn $ "Created " ++ tmpName
   hPutStr tmpHandle content
   hClose tmpHandle
-  
-  msg <- readProcess "runghc" [tmpName] []
-  removeDirectory tmp_dir
-  
+  (exitcode, out_msg, err_msg) <- readProcessWithExitCode
+                                     "runghc" [tmpName] []
+                                     
+  let stdout_msg = case out_msg of
+                     "" -> ""
+                     _  -> "Program output:\n" ++ out_msg
+                     
+  let stderr_msg = case err_msg of
+                     "" -> ""
+                     _  -> err_msg
+                     
+  let failure_msg = replace (tmpName ++ ":") ""
+                    $ nToBR ((show exitcode)
+                           ++ "\n"
+                           ++ stdout_msg
+                           ++ stderr_msg)
+                     
+  let msg = case exitcode of
+              ExitSuccess -> out_msg
+              ExitFailure code -> failure_msg
+                                     
+  removeDirectoryRecursive tmp_dir
   return msg
   
 ------------------------------------------------------------------

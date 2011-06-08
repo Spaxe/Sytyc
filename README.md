@@ -27,6 +27,7 @@ Haskell dependencies:
   * GHC version >= 7.0.3. As of Feb 2011, the official Haskell Platform 
   supports GHC 7.0.3. Sytyc was compiled against the GHC libraries.
   * pandoc-1.8
+  * missingH-1.1.0.3
 
 Server dependencies:
   * Apache, or other server programs that support CGI.
