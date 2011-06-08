@@ -140,7 +140,6 @@ runJava source = do
   hPutStr tmpHandle source'
   hClose tmpHandle
 
-  -- Javac doesn't return ExitFailure with code. 
   (exitcode, out_msg, err_msg) <- readProcessWithExitCode
                                   "javac" [tmpName] []
   
@@ -155,22 +154,23 @@ runJava source = do
                   , std_err = CreatePipe
                   , std_out = CreatePipe
                   }
+  hClose hin
   exitcode' <- waitForProcess hJava
   out_msg' <- hGetContents hout
   err_msg' <- hGetContents herr
-  hClose hin
   hClose hout
   hClose herr
   -- (exitcode', out_msg', err_msg') <- readProcessWithExitCode
   --                                   "java" [ "-cp" ++ tmp_dir
   --                                          , className] []
   let msg = case (exitcode, exitcode') of
-              (_, ExitSuccess) -> out_msg
+              (_, ExitSuccess) -> "Program works! Woot." ++ out_msg'
               -- (ExitSuccess, _) -> "Mrraa"
               (ExitFailure code, _) -> compiler_error
                 where
-                  compiler_error = replace (tmpName ++ ":") ""
-                                  $ nToBR ((show exitcode)
+                  compiler_error = replace (tmpName ++ ":") "Line "
+                                  $ nToBR ("Compilation failed with " 
+                                           ++ (show exitcode)
                                            ++ "\n"
                                            ++ out_msg
                                            ++ "\n"
@@ -178,7 +178,8 @@ runJava source = do
                                           ) 
               (_, _) -> runtime_msg
                 where 
-                  runtime_msg = nToBR $ out_msg' 
+                  runtime_msg = nToBR $ "Runtime Error!\n"
+                                      ++ out_msg' 
                                       ++ "\n" 
                                       ++ err_msg' 
       

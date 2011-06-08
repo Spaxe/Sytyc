@@ -21,6 +21,8 @@ Installation & Usage
 --------------------
 @TODO
 
+Sytyc is not thread-safe. You should not compile and run it with -thread flag.
+
 Dependencies
 ------------
 Haskell dependencies:
