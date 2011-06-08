@@ -17,7 +17,7 @@ cgiMain = do
   footer <- liftIO $ footer_text
   let page = parseTemplate [ ("TEMPLATE_CONTENT", index_partial)
                            , ("NAME", prog_name)
-                           , ("VERSION", footer)] 
+                           , ("FOOTER", footer)] 
                            template
   output page
 

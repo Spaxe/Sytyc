@@ -48,17 +48,6 @@ result_file = "result.md"
 template_html = "template.html"
 problem_html = "problem.html"
 
-build_time :: IO String
-build_time = do
-  time <- getClockTime
-  time' <- toCalendarTime time
-  return $ calendarTimeToString time'
-  
-footer_text :: IO String
-footer_text = do
-  time <- build_time
-  return $ "Sytyc " ++ version ++ " (Built on " ++ time ++ ")"
-
 ------------------------------------------------------------------
 -- Page construction
 -- | A shorthand because I get them confused otherwise.
@@ -107,3 +96,17 @@ parseResultTemplate result
 -- | Takes a string and replaces all newline characters \n with <br>.
 nToBR :: String -> String
 nToBR = replace "\n" "<br>"
+
+
+------------------------------------------------------------------
+-- Extra stuff
+build_time :: IO String
+build_time = do
+  time <- getClockTime
+  time' <- toCalendarTime time
+  return $ calendarTimeToString time'
+  
+footer_text :: IO String
+footer_text = do
+  time <- build_time
+  return $ "Sytyc " ++ version ++ " (Built on " ++ time ++ ")"

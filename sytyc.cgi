@@ -132,10 +132,12 @@ cgiMain = do
   problem_partial <- liftIO $ parseMarkdownFile $ problem_dir ++ problem_file
   template <- liftIO $ exReadFile template_html
   this_page <- liftIO $ exReadFile problem_html
-  let page = parseTemplate [("TEMPLATE_CONTENT", this_page)] template
-  let template_strings = [ ("NAME", prog_name)
-                         , ("VERSION", footer)
-                         , ("PROBLEM", problem_partial)
+  footer <- liftIO $ footer_text
+  let page = parseTemplate [ ("TEMPLATE_CONTENT", this_page)
+                           , ("NAME", prog_name)
+                           , ("FOOTER", footer)
+                           ] template
+  let template_strings = [ ("PROBLEM", problem_partial)
                          , ("RESULT_TEMPLATE", result_partial)
                          , ("SOURCE_CODE", r')
                          ]
