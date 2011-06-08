@@ -1,37 +1,14 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>
-$NAME$
-    </title>
-    <link href="style.css" rel="stylesheet" type="text/css">
-  </head>
-  <body>
-    <div id="wrapper">
-      <div id="navbar">
-        <ul>
-          <a href="#"><li>Home</li></a>
-          <a href="#"><li>Problems</li></a>
-          <a href="#"><li>FAQ</li></a>
-          <a href="#"><li>Feedback</li></a>
-        </ul>
-      </div>
-      <div id="content">
 $PROBLEM$
 $RESULT_TEMPLATE$
-        <div id="form">
-          <form name="input" action="sytyc.cgi" method="post">
-            <textarea rows="24" cols="80" name="solution" placeholder="Place your solution here.">
-$SOURCE_CODE$
-            </textarea><br>
-            <input type="submit" value="Submit" id="button" />
-          </form>
-        </div>
-      </div>
-      <div id="footer">
-        <img src="images/CC_by-sa_80x15.png" />
-        <div id="version">Sytyc v1.0</div>
-      </div>
+<div id="form">
+  <form name="input" action="sytyc.cgi" method="post">
+    <div id="languages">
+      <input type="radio" name="language" value="haskell" /> Haskell
+      <input type="radio" name="language" value="java" /> Java
     </div>
-  </body>
-</html>
+    <br>
+    <textarea rows="24" cols="80" name="solution" placeholder="Place your solution here.">
+$SOURCE_CODE$</textarea><br>
+    <input type="submit" value="Submit" id="button" />
+  </form>
+</div>

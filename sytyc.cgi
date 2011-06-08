@@ -36,6 +36,7 @@ supported_languages = [ "haskell"
                       
 result_file = "result.md"
 
+template_html = "template.html"
 problem_html = "problem.html"
 problem_file = "001_Summation-of-Integers.md"
 
@@ -98,7 +99,6 @@ nToBR = replace "\n" "<br>"
 -- Unfortunately it's not exactly unified.
 -- 
 -- Edit this section with care. Chances are, more things break if changed.
-
 
 -- Haskell
 runghc :: String -> IO String
@@ -191,21 +191,29 @@ runJava source = do
 cgiMain :: CGI CGIResult
 cgiMain = do
   r <- getInput "solution"
+  lang <- getInput "language"
   let r' = case r of
              Just a -> a
              Nothing -> ""
-  result <- liftIO $ runJava r'
+  let lang' = case lang of
+                Just a -> a
+                Nothing -> ""
+  result <- case lang' of
+              "haskell" -> liftIO $ runghc r'
+              "java"    -> liftIO $ runJava r'
+              _         -> return ""
   
   result_partial <- liftIO $ parseResultTemplate result
   problem_partial <- liftIO $ parseProblemTemplate problem_file
-  
+  template <- liftIO $ exReadFile template_html
+  this_page <- liftIO $ exReadFile problem_html
+  let page = parseTemplate [("TEMPLATE_CONTENT", this_page)] template
   let template_strings = [ ("NAME", "Sytyc - Programming Judge")
                          , ("PROBLEM", problem_partial)
                          , ("RESULT_TEMPLATE", result_partial)
                          , ("SOURCE_CODE", r')
                          ]
-  page <- liftIO $ parseTemplateFile template_strings problem_html
-  output page
+  output $ parseTemplate template_strings page
 
   
 main :: IO ()
