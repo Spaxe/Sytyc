@@ -128,7 +128,7 @@ cgiMain = do
               "java"    -> liftIO $ runJava r'
               _         -> return ""
   
-  result_partial <- liftIO $ parseResultTemplate result
+  result_partial <- liftIO $ parseResultTemplate $ nToBR result
   problem_partial <- liftIO $ parseMarkdownFile $ problem_dir ++ problem_file
   template <- liftIO $ exReadFile template_html
   this_page <- liftIO $ exReadFile problem_html
