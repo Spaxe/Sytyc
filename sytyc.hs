@@ -15,8 +15,9 @@ module Sytyc
   , template_html
   , problem_html
   , prog_name
-  , footer
   , version
+  , build_time
+  , footer_text
   ) where
   
 import Prelude hiding (catch)
@@ -27,6 +28,7 @@ import Text.Pandoc.Writers.HTML (writeHtmlString)
 import Text.Pandoc.Shared (defaultWriterOptions)
 import Text.Pandoc.Parsing (defaultParserState)
 import Data.String.Utils (replace)
+import System.Time (getClockTime, toCalendarTime, calendarTimeToString)
 
 ------------------------------------------------------------------
 -- Constants
@@ -45,7 +47,17 @@ result_file = "result.md"
 
 template_html = "template.html"
 problem_html = "problem.html"
-footer = "Sytyc " ++ version
+
+build_time :: IO String
+build_time = do
+  time <- getClockTime
+  time' <- toCalendarTime time
+  return $ calendarTimeToString time'
+  
+footer_text :: IO String
+footer_text = do
+  time <- build_time
+  return $ "Sytyc " ++ version ++ " (Built on " ++ time ++ ")"
 
 ------------------------------------------------------------------
 -- Page construction
