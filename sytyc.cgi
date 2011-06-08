@@ -1,4 +1,4 @@
-#!runhaskell
+#!runghc
 
 -- This file requires GHC version >= 7.0.3
 
@@ -45,14 +45,17 @@ parseProblem problem = do
          $ readMarkdown defaultParserState file
 
 -- | Runs a Haskell file
-runHaskellFile :: String -> IO String
-runHaskellFile content = do
+runghcFile :: String -> IO String
+runghcFile content = do
   (tmpName, tmpHandle) <- openTempFile "./tmp" "temp"
   hPutStr tmpHandle content
   hClose tmpHandle
-  s <- readProcess "runhaskell" [tmpName] []
+  s <- readProcess "runghc" [tmpName] []
   removeFile tmpName
   return s
+  
+-- | Constructs the result
+constructResult :: String -> String
 
 ------------------------------------------------------------------
 -- Entry functions
@@ -63,7 +66,7 @@ cgiMain = do
                   Just a -> a
                   Nothing -> ""
   problem <- liftIO $ parseProblem (problem_dir ++ problem_file)
-  r <- liftIO $ runHaskellFile result'
+  r <- liftIO $ runghcFile result'
   let template_strings = [ ("NAME", "Sytyc - Programming Judge")
                          , ("PROBLEM", problem)
                          , ("RESULT", r)
