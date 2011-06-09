@@ -41,6 +41,7 @@ tmp_dir = "tmp" -- Do NOT add the slash at the end!
 
 supported_languages = [ "haskell"
                       , "java"
+                      , "mash"
                       ]
                       
 result_file = "result.md"

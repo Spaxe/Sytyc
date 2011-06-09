@@ -1,0 +1,2075 @@
+/*
+** file:     console.mashenv
+** modified: Sun May 22 16:12:08 EST 2011
+** author:   Andrew Rock
+*/
+
+environment console {
+
+   purpose <#
+      This environment supports programming for a console program that reads 
+      from standard input and writes to standard output.
+   #>
+
+   private class {
+      purpose <#
+         The code must be wrapped in a class declaration.
+      #><#
+         There are no imports. Imports are BAD, as they cause name collisions
+         with student program names that drive the students and tutors crazy
+         trying to figure out.
+      #>
+      prelude {#
+         public class #PROGRAM_NAME# {
+      #}
+      postlude {#
+         }
+      #}
+   }
+   
+   public mandatory rewrite void main() {
+      purpose <#
+         A program that is organised into methods must have a {\tt main} method
+         (a procedure with no arguments). This will be the first method to
+         execute. {\tt mashc} automatically rewrites this method to conform to 
+         standard Java.
+      #>
+      prelude {#
+         public static void main(java.lang.String[] mash_args_param) 
+         throws java.lang.Exception {
+            #OPEN_DEBUGGER#
+      #}
+      postlude {#
+            #CLOSE_DEBUGGER#
+         }
+      #}
+   }
+
+   private void main() {
+      purpose <# 
+         To allow a program to call its own {\tt main} method even though it
+         gets rewritten. Probably a bad idea, but hey, why not.
+      #>
+      inline {#
+         main(null)
+      #}
+   }
+   
+   public section <#Console input#> {
+
+      public purpose <# 
+         The following are methods for reading from standard input (which is 
+         usually the keyboard) and for checking to see if there is more input
+         to read.
+      #>
+
+      private member {
+         purpose <#
+            Scanner object for reading from standard input.
+         #>
+         inline {#
+            private static java.util.Scanner mash_console_scanner 
+               = new java.util.Scanner(System.in);
+         #}
+      }
+   
+      public int readInt() {
+         purpose <#
+            Returns the next integer from standard input.
+         #> 
+         precondition <# 
+           Will cause a run time error unless there is an integer in standard
+           input to read. Use {\tt isNextInt()} to check first.
+         #>
+         inline {#
+            mash_console_scanner.nextInt()
+         #}
+      }
+
+      public long readLong() {
+         purpose <#
+            Returns the next long from standard input.
+         #> 
+         precondition <# 
+            Will cause a run time error unless there is a long in standard input
+            to read. Use {\tt isNextLong()} to check first.
+         #>
+         inline {#
+            mash_console_scanner.nextLong()
+         #}
+      }
+
+      public boolean readBoolean() {
+         purpose <#
+            Returns the next boolean from standard input.
+         #> 
+         precondition <# 
+            Will cause a run time error unless there is a boolean in standard
+            input to read. Use {\tt isNextBoolean()} to check first.
+         #>
+         inline {#
+            mash_console_scanner.nextBoolean()
+         #}
+      }
+   
+      public double readDouble() {
+         purpose <#
+            Returns the next double from standard input.
+         #> 
+         precondition <# 
+            Will cause a run time error unless there is a double in standard
+            input to read. Use {\tt isNextDouble()} to check first.
+         #>
+         inline {#
+            mash_console_scanner.nextDouble()
+         #}
+      }
+   
+      public float readFloat() {
+         purpose <#
+            Returns the next float from standard input.
+         #> 
+         precondition <# 
+            Will cause a run time error unless there is a float in standard 
+            input to read. Use {\tt isNextFloat()} to check first.
+         #>
+         inline {#
+            mash_console_scanner.nextFloat()
+         #}
+      }
+   
+      public String readWord() {
+         purpose <#
+            Returns the next word as a {\tt String}. A ``word'' is a sequence of
+            one-or-more non-whitespace characters.
+         #> 
+         precondition <# 
+            Will cause a run time error unless there is a word in standard input
+            to read. Use {\tt isNextWord()} to check first.
+         #>
+         inline {#
+            mash_console_scanner.next()
+         #}
+      }
+
+      public String readLine() {
+         purpose <#
+            Returns the next line of text as a {\tt String}. A line is a 
+            sequence of zero-or-more characters terminated by the end of line,
+            which is not returned as part of the line.
+         #> 
+         precondition <# 
+            Will cause a run time error unless there is a line in standard input
+            to read. Use {\tt isNextLine()} to check first.
+         #>
+         inline {#
+            mash_console_scanner.nextLine()
+         #}
+      }
+      
+      public boolean isNextInt() {
+         purpose <#
+            Returns {\tt true} if and only if there is an integer in standard 
+            input available to read, that is {\tt readInt()} would succeed.
+         #> 
+         inline {#
+            mash_console_scanner.hasNextInt()
+         #}
+      }
+
+      public boolean isNextLong() {
+         purpose <#
+            Returns {\tt true} if and only if there is a long in standard input
+            available to read, that is {\tt readLong()} would succeed.
+         #> 
+         inline {#
+            mash_console_scanner.hasNextLong()
+         #}
+      }
+
+      public boolean isNextBoolean() {
+         purpose <#
+            Returns {\tt true} if and only if there is an boolean in standard 
+            input available to read, that is {\tt readBoolean()} would succeed.
+         #> 
+         inline {#
+            mash_console_scanner.hasNextBoolean()
+         #}
+      }
+
+      public boolean isNextDouble() {
+         purpose <#
+            Returns {\tt true} if and only if there is a double in standard
+            input available to read, that is {\tt readDouble()} would succeed.
+         #> 
+         inline {#
+            mash_console_scanner.hasNextDouble()
+         #}
+      }
+
+      public boolean isNextFloat() {
+         purpose <#
+            Returns {\tt true} if and only if there is a float in standard input
+            available to read, that is {\tt readFloat()} would succeed.
+         #> 
+         inline {#
+            mash_console_scanner.hasNextFloat()
+         #}
+      }
+   
+      public boolean isNextWord() {
+         purpose <#
+            Returns {\tt true} if and only if there is a word in standard input
+            available to read, that is {\tt readWord()} would succeed.
+         #> 
+         inline {#
+            mash_console_scanner.hasNext()
+         #}
+      }
+   
+      public boolean isNextLine() {
+         purpose <#
+            Returns {\tt true} if and only if there is a line in standard input
+            available to read, that is {\tt readLine()} would succeed.
+         #> 
+         inline {#
+            mash_console_scanner.hasNextLine()
+         #}
+      }
+
+   }
+
+   public section <#Console output#> {
+
+      public purpose <# 
+         The following are methods for printing to standard output (which is 
+         usually the terminal window).
+      #>
+
+      public void print(char c) {
+         purpose <#
+            Writes character {\tt c} to standard output.
+         #>
+         inline {#
+            java.lang.System.out.print(#c#)
+         #}
+      }
+   
+      public void print(String s) {
+         purpose <#
+            Writes string {\tt s} to standard output.
+         #>
+         inline {#
+            java.lang.System.out.print(#s#)
+         #}
+      }
+   
+      public void print(long i) {
+         purpose <# 
+            Writes integral {\tt i} to standard output.
+         #>
+         inline {#
+            java.lang.System.out.print(#i#)
+         #}
+      }
+   
+      public void print(boolean p) {
+         purpose <# 
+            Writes boolean {\tt p} to standard output.
+         #>
+         inline {#
+            java.lang.System.out.print(#p#)
+         #}
+      }
+   
+      public void print(double x) {
+         purpose <# 
+            Writes floating point number {\tt x} to standard output.
+         #>
+         inline {#
+            java.lang.System.out.print(#x#)
+         #}
+      }
+   
+      public void println(char c) {
+         purpose <#
+            Writes character {\tt c} and then a newline to standard output.
+         #>
+         inline {#
+            java.lang.System.out.println(#c#)
+         #}
+      }
+   
+      public void println() {
+         purpose <#
+            Writes a newline to standard output.
+         #>
+         inline {#
+            java.lang.System.out.println()
+         #}
+      }
+   
+      public void println(String s) {
+         purpose <#
+            Writes string {\tt s} and then a newline to standard output.
+         #>
+         inline {#
+            java.lang.System.out.println(#s#)
+         #}
+      }
+   
+      public void println(long i) {
+         purpose <# 
+            Writes integral {\tt i} and then a newline to standard output.
+         #>
+         inline {#
+            java.lang.System.out.println(#i#)
+         #}
+      }
+   
+      public void println(boolean p) {
+         purpose <# 
+            Writes boolean {\tt p} and then a newline to standard output.
+         #>
+         inline {#
+            java.lang.System.out.println(#p#)
+         #}
+      }
+   
+      public void println(double x) {
+         purpose <# 
+            Writes floating point number {\tt x} and then a newline to standard
+            output.
+         #>
+         inline {#
+            java.lang.System.out.println(#x#)
+         #}
+      }
+
+   }
+   
+   public section <#Math#> {
+
+      public purpose <# 
+         The following are some commonly used numeric constants and functions.
+      #>
+
+      public final int MAX_INT {
+         purpose <#
+            A constant holding the maximum value an {\tt int} can have, 
+            $2^{31}-1$.
+         #>
+         inline {#
+            java.lang.Integer.MAX_VALUE
+         #}
+      }
+   
+      public final int MIN_INT {
+         purpose <#
+            A constant holding the minimum value an {\tt int} can have, 
+            $- 2^{31}$.
+         #>
+         inline {#
+            java.lang.Integer.MIN_VALUE
+         #}
+      }
+
+      public final long MAX_LONG {
+         purpose <#
+            A constant holding the maximum value a {\tt long} can have, 
+            $2^{63}-1$.
+         #>
+         inline {#
+            java.lang.Long.MAX_VALUE
+         #}
+      }
+   
+      public final long MIN_LONG {
+         purpose <#
+            A constant holding the minimum value a {\tt long} can have, 
+            $- 2^{63}$.
+         #>
+         inline {#
+            java.lang.Long.MIN_VALUE
+         #}
+      }
+   
+      public final double PI {
+         purpose <#
+            The closest {\tt double} approximation to $\pi$.
+         #>
+         inline {#
+            java.lang.Math.PI
+         #}
+      }
+   
+      public double abs(double a) {
+         purpose <# 
+            Returns the absolute value of {\tt a}.
+         #>
+        inline {#
+           java.lang.Math.abs(#a#)
+         #}
+      }
+
+      public float abs(float a) {
+         purpose <# 
+            Returns the absolute value of {\tt a}.
+         #>
+         inline {#
+            java.lang.Math.abs(#a#)
+         #}
+      }
+
+      public long abs(long a) {
+         purpose <# 
+            Returns the absolute value of {\tt a}.
+         #>
+         inline {#
+            java.lang.Math.abs(#a#)
+         #}
+      }
+   
+      public int abs(int a) {
+         purpose <# 
+            Returns the absolute value of {\tt a}.
+         #>
+         inline {#
+            java.lang.Math.abs(#a#)
+         #}
+      }   
+   
+      public double ceil(double a) {
+         purpose <# 
+            Returns the least double value that is greater than or equal to 
+            {\tt a} and equal to an integer.
+         #> 
+         inline {#
+            java.lang.Math.ceil(#a#)
+         #}
+      }
+
+      public double exp(double x) {
+         purpose <# 
+            Returns $e^x$, that is Euler's constant $e$ raised to power
+            $x$.
+         #> 
+         inline {#
+            java.lang.Math.exp(#x#)
+         #}
+      }
+
+      public double floor(double a) {
+         purpose <# 
+            Returns the greatest double value that is less than or equal to
+            {\tt a} and equal to an integer.
+         #>
+         inline {#
+            java.lang.Math.floor(#a#)
+         #}
+      }
+
+      public double log(double x) {
+         purpose <# 
+            Returns the natural logarithm of $x$.
+         #> 
+         inline {#
+            java.lang.Math.log(#x#)
+         #}
+      }
+   
+      public long round(double a) {
+         purpose <# 
+            Returns the closest {\tt long} to {\tt a}.
+         #>
+         inline {#
+            java.lang.Math.round(#a#)
+         #}
+      }
+   
+      public int round(float a) {
+         purpose <# 
+           Returns the closest {\tt int} to {\tt a}.
+         #>
+         inline {#
+            java.lang.Math.round(#a#)
+         #}
+      }
+
+      public double sqrt(double a) {
+         purpose <# 
+            Returns the square root of {\tt a}.
+         #>
+         precondition <# 
+           {\tt a} $\ge 0.0$.
+         #>
+         inline {#
+            java.lang.Math.sqrt(#a#)
+         #}
+      }
+      
+      public double pow(double a, double b) {
+         purpose <# 
+            Returns {\tt a} raised to the power {\tt b}, $a^b$.
+         #>
+         inline {#
+            java.lang.Math.pow(#a#, #b#)
+         #}
+      }
+      
+      public double sin(double a) {
+         purpose <# 
+            Returns the trigonometric sine of {\tt a} radians.
+         #>
+         inline {#
+            java.lang.Math.sin(#a#)
+         #}
+      }
+   
+      public double cos(double a) {
+         purpose <# 
+            Returns the trigonometric cosine of {\tt a} radians.
+         #>
+         inline {#
+            java.lang.Math.cos(#a#)
+         #}
+      }
+   
+      public double tan(double a) {
+         purpose <# 
+            Returns the trigonometric tangent of {\tt a} radians.
+         #>
+         inline {#
+            java.lang.Math.tan(#a#)
+         #}
+      }
+   
+      public double asin(double a) {
+         purpose <# 
+            Returns the trigonometric arc sine of {\tt a} in radians.
+         #>
+         inline {#
+            java.lang.Math.asin(#a#)
+         #}
+      }
+   
+      public double acos(double a) {
+         purpose <# 
+            Returns the trigonometric arc cosine of {\tt a} in radians.
+         #>
+         inline {#
+            java.lang.Math.acos(#a#)
+         #}
+      }
+   
+      public double atan(double a) {
+         purpose <# 
+            Returns the trigonometric arc tangent of {\tt a} in radians.
+         #>
+         inline {#
+            java.lang.Math.atan(#a#)
+         #}
+      }
+
+      public double max(double a, double b) {
+         purpose <# 
+            Returns the greater of {\tt a} and  {\tt b}.
+         #>
+         inline {#
+            java.lang.Math.max(#a#, #b#)
+         #}
+      }
+
+      public float max(float a, float b) {
+         purpose <# 
+            Returns the greater of {\tt a} and  {\tt b}.
+         #>
+         inline {#
+            java.lang.Math.max(#a#, #b#)
+         #}
+      }
+      
+      public int max(int a, int b) {
+         purpose <# 
+            Returns the greater of {\tt a} and  {\tt b}.
+         #>
+         inline {#
+            java.lang.Math.max(#a#, #b#)
+         #}
+      }
+   
+      public long max(long a, long b) {
+         purpose <# 
+            Returns the greater of {\tt a} and  {\tt b}.
+         #>
+         inline {#
+            java.lang.Math.max(#a#, #b#)
+         #}
+      }
+
+      public double min(double a, double b) {
+         purpose <# 
+            Returns the lesser of {\tt a} and  {\tt b}.
+         #>
+         inline {#
+            java.lang.Math.min(#a#, #b#)
+         #}
+      }
+
+      public float min(float a, float b) {
+         purpose <# 
+            Returns the lesser of {\tt a} and  {\tt b}.
+         #>
+         inline {#
+            java.lang.Math.min(#a#, #b#)
+         #}
+      }
+      
+      public int min(int a, int b) {
+         purpose <# 
+            Returns the lesser of {\tt a} and  {\tt b}.
+         #>
+         inline {#
+            java.lang.Math.min(#a#, #b#)
+         #}
+      }
+   
+      public long min(long a, long b) {
+         purpose <# 
+            Returns the lesser of {\tt a} and  {\tt b}.
+         #>
+         inline {#
+            java.lang.Math.min(#a#, #b#)
+         #}
+      }
+
+      public double random() {
+         purpose <# 
+            Returns a random value $x$ such that $0.0 \le x < 1.0$.
+         #>
+         inline {#
+           java.lang.Math.random()
+         #}
+      }
+
+   } // end section: Math
+   
+   public section <#Strings#> {
+
+      public purpose <# 
+         The following are methods for working with {\tt String}s.
+      #>
+
+      public int length(String s) {
+         purpose <# 
+            Returns the length of {\tt s}.
+         #>
+        inline {#
+           #s#.length()
+         #}
+      }
+   
+      public char charAt(String s, int i) {
+         purpose <# 
+            Returns the character at position {\tt i} in {\tt s}.
+         #>
+         precondition <# 
+            $0 \le$ {\tt i} $<$ {\tt length(s)}.
+         #>
+        inline {#
+           #s#.charAt(#i#)
+         #}
+      }
+   
+      public boolean equals(String a, String b) {
+         purpose <# 
+            Returns {\tt true} if and only if {\tt a} contains the same sequence
+            of characters as in {\tt b}.
+         #>
+        inline {#
+           #a#.equals(#b#)
+         #}
+      }
+
+      public String format(boolean p, int w) {
+         purpose <# 
+            Returns {\tt p} converted to a string, padded with spaces to a
+            minimum width \textbar{\tt w}\textbar. If {\tt w} is negative, the result is 
+            left-justified, otherwise right-justified.
+         #>
+         inline {#
+            java.lang.String.format("%" + (#w#) + "b",
+               new java.lang.Boolean(#p#))
+         #}
+      }
+
+      public String format(char c, int w) {
+         purpose <# 
+            Returns {\tt c} converted to a string, padded with spaces to a
+            minimum width \textbar{\tt w}\textbar. If {\tt w} is negative, the result is 
+            left-justified, otherwise right-justified.
+         #>
+         inline {#
+            java.lang.String.format("%" + (#w#) + "c",
+               new java.lang.Character(#c#))
+         #}
+      }
+
+      public String format(double d, int w, char f, int p) {
+         purpose <# 
+            Returns {\tt d} converted to a string, padded with spaces to a
+            minimum width \textbar {\tt w}\textbar. If {\tt w} is negative, the result is 
+            left-justified, otherwise right-justified. {\tt f} controls the
+            format: {\tt 'e'} selects scientific notation; {\tt 'f'} selects
+            fixed point; or {\tt 'g'} selects the best format depending on the
+            number and {\tt p}. {\tt p} is the number of decimal digits
+            to display after the decimal point.
+         #>
+         inline {#
+            java.lang.String.format("%" + (#w#) + "." + (#p#) + (#f#), 
+               new Double(#d#))
+         #}
+      }
+
+      public String format(long l, int w) {
+         purpose <# 
+            Returns {\tt l} converted to a string, padded with spaces to a
+            minimum width \textbar{\tt w}\textbar. If {\tt w} is negative, the result is 
+            left-justified, otherwise right-justified.
+         #>
+         inline {#
+            java.lang.String.format("%" + (#w#) + "d",
+               new java.lang.Long(#l#))
+         #}
+      }
+
+      public String format(String s, int w) {
+         purpose <# 
+            Returns {\tt s} padded with spaces to a minimum width \textbar{\tt w}\textbar. 
+            If {\tt w} is negative, the result is left-justified, otherwise
+            right-justified.
+         #>
+         inline {#
+            java.lang.String.format("%" + (#w#) + "s",
+               #s#)
+         #}
+      }
+
+      public boolean parseBoolean(String s) {
+         purpose <# 
+            Returns {\tt s} converted to a {\tt boolean}.
+         #>
+         inline {#
+            java.lang.Boolean.parseBoolean(#s#)
+         #}
+      }
+
+      public int parseInt(String s) {
+         purpose <# 
+            Returns {\tt s} converted to an {\tt int}.
+         #>
+         inline {#
+            java.lang.Integer.parseInt(#s#)
+         #}
+      }
+
+      public long parseLong(String s) {
+         purpose <# 
+            Returns {\tt s} converted to a {\tt long}.
+         #>
+         inline {#
+            java.lang.Long.parseLong(#s#)
+         #}
+      }
+
+      public float parseFloat(String s) {
+         purpose <# 
+            Returns {\tt s} converted to a {\tt float}.
+         #>
+         inline {#
+            java.lang.Float.parseFloat(#s#)
+         #}
+      }
+
+      public double parseDouble(String s) {
+         purpose <# 
+            Returns {\tt s} converted to a {\tt double}.
+         #>
+         inline {#
+            java.lang.Double.parseDouble(#s#)
+         #}
+      }
+
+   } // end section: Strings
+
+   public section <#Debugger#> {
+   
+      public purpose <#
+         This environment supports a debugger with a graphical user interface.
+         It allows the user to slow down the execution of a program, so that
+         the flow of control through the program may be observed and the
+         values in variables monitored.
+      #><#
+         To activate the debugger, compile your program with the 
+         \verb"mashc" \verb"+debug" option. 
+      #><#
+         While the program is running under the control of the debugger,
+         the original MaSH program's source code is displayed on the left,
+         with a pointer showing the statement that is about to execute.
+         Sometimes it will point to a closing brace, indicating that the 
+         current method is about to be exited, or a loop guard is about
+         to be tested again, depending on the context.
+      #><#   
+         The contents of all the program's variables are displayed on the right
+         in a table. The entries in the {\it scope} column, consist of a number
+         and a word. The number indicates which method invocation the variable
+         belongs to. For no-method MaSH programs the number is always 0.
+         For method MaSH programs, 0 indicates a global variable, 1 indicates
+         the \verb"main" method, 2 indicates a method called from \verb"main", 
+         3 indicates a method called from 2, etc. The word is blank for 
+         variables in a no-method program, unless the variable is declared in a 
+         block, which makes it {\it local}. In method programs, the word can 
+         be: {\it global}; {\it local}; or {\it param}. Variables are added 
+         to the table as they come into scope and removed again when their 
+         enclosing block exits. Anything changed on the last program step is 
+         displayed in green.
+      #><#   
+         Limitations: The debugger can not display values of arrays with
+         3 or more dimensions. The debugger can not step through methods that
+         run in the programs event dispatch thread (for example, the 
+         \verb"paintWindow" method in the \verb"graphics" environment).
+         This GUI debugger can not work in environments without a big screen
+         (for example, Lego Mindstorms).
+      #>
+         
+      private debug member {
+         purpose <# 
+            This object is a stack that maintains a model of the
+            program's runtime environment. It presents the 
+            interface for the code generated by the \verb"+debug"
+            option.
+         #><#
+            {\tt mash\verb"_"debugger.open()} opens the debugger window (program
+            is about to start).
+         #><#
+            {\tt mash\verb"_"debugger.close()} closes the debugger window 
+            (program is about to terminate).
+         #><#
+            {\tt mash\verb"_"debugger.push(String name, String kind,
+            String type, String value)} adds a new variable.
+         #><#
+            {\tt mash\verb"_"debugger.push()} notes we have entered a new method
+            (start a new stack frame).
+         #><#
+            {\tt mash\verb"_"debugger.pop(int n)} remove $n$ variables.
+         #><#
+            {\tt mash\verb"_"debugger.pop()} remove the current stack frame (we
+            are exiting a method).
+         #><#
+            {\tt mash\verb"_"debugger.set(String name, value)} updates the value
+            in the named variable.
+         #><#
+            {\tt mash\verb"_"debugger.checkpoint(int line, int column)} allows
+            the debugger window to update and control execution timing.
+         #><#
+            {\tt mash\verb"_"debugger.testpoint(int line, int column, boolean p)} allows
+            the debugger window to update and control execution timing, returning p.
+         #><#
+            {\tt mash\verb"_"debugger.checkpoint()} a checkpoint where the
+            location is the very end of the program (it's about to terminate).
+         #><#
+            {\tt mash\verb"_"debugger.toString(value)} convert a java value to
+            a string. 
+         #><#
+            {\tt mash\verb"_"debugger.suspend()} turn the debugger off
+            tempoparily (e.g. to stop the event dispatcher thread blocking).
+         #><#
+            {\tt mash\verb"_"debugger.suspend()} turn the debugger on again.
+         #><#
+            {\tt mash\verb"_"debugger.update()} update the debugger display
+            (after some asyncronous event).
+         #>
+         inline {#
+            
+            // Debugger stack class
+            private static class MaSHDebuggerStack {
+
+               // One entry on the debugger's stack
+               private class MaSHDebuggerVar {
+               
+                  public int stackFrame; // 0 = global, 1, 2, ... per method
+                  public java.lang.String name; // "x"
+                  public java.lang.String kind; // "global", ...
+                  public java.lang.String type; // "int", ...
+                  public java.lang.String value; // "3"
+                  public int freshness; // 0 = old, 1 = new value; 2 = new var
+                  
+                  public MaSHDebuggerVar(int stackFrame, java.lang.String name, 
+                     java.lang.String kind, java.lang.String type, java.lang.String value) {
+                     this.stackFrame = stackFrame;
+                     this.name = name;
+                     this.kind = kind;
+                     this.type = type;
+                     this.value = value;
+                     freshness = 2;
+                  }
+                  
+                  public void set(java.lang.String value) {
+                     this.value = value;
+                     freshness = 1;
+                  }
+                  
+                  public void reset() {
+                     freshness = 0;
+                  }
+                  
+               } // end class: MaSHDebuggerVar
+               
+               // the stack of program variables to display
+               private java.util.Stack<MaSHDebuggerVar> stack = 
+                  new java.util.Stack<MaSHDebuggerVar>();
+               
+               // what is the current stackFrame number, starts 0 = global
+               private int stackFrame = 0;
+               
+               // start a new stack frame
+               public void push() {
+                  if (!suspended) {
+                     stackFrame++;
+                  }
+               }
+               
+               // add a new variable
+               public void push(java.lang.String name, java.lang.String kind, java.lang.String type, 
+                                java.lang.String value) {
+                  if (!suspended) {
+                     stack.push(new
+                        MaSHDebuggerVar(stackFrame, name, kind, type, value));
+                  }
+               }
+               
+               // remove n variables
+               public void pop(int n) {
+                  if (!suspended) {
+                     for (int i = 0; i < n; i++) {
+                        stack.pop();
+                     }
+                  }
+               }
+               
+               // pop the current stack frame
+               public void pop() {
+                  if (!suspended) {
+                     while (stack.size() > 0 && 
+                            stack.elementAt(stack.size() - 1).stackFrame == 
+                            stackFrame) {
+                        stack.pop();
+                     }
+                     stackFrame--;
+                  }
+               }
+               
+               // find a variable, either a local in the current stack frame, 
+               // or a global
+               private MaSHDebuggerVar lookup(java.lang.String name) {
+                  for (int i = stack.size() - 1; i >= 0; i--) {
+                     MaSHDebuggerVar v = stack.elementAt(i);
+                     if (name.equals(v.name) && 
+                         (v.stackFrame == stackFrame || v.stackFrame == 0)) {
+                        return v;
+                     }
+                  }
+                  return null;
+               }
+               
+               // update a value (generic version, after the fact)
+               public void set(java.lang.String name, java.lang.String value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(value);
+                  }
+               }
+
+               // update a value (inline versions)
+               public boolean iset(java.lang.String name, boolean value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public byte iset(java.lang.String name, byte value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public double iset(java.lang.String name, double value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public float iset(java.lang.String name, float value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public int iset(java.lang.String name, int value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public long iset(java.lang.String name, long value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public char iset(java.lang.String name, char value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public java.lang.String iset(java.lang.String name, java.lang.String value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public boolean[] iset(java.lang.String name, boolean[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public byte[] iset(java.lang.String name, byte[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public double[] iset(java.lang.String name, double[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public float[] iset(java.lang.String name, float[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public int[] iset(java.lang.String name, int[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public long[] iset(java.lang.String name, long[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public char[] iset(java.lang.String name, char[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public java.lang.String[] iset(java.lang.String name, java.lang.String[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public boolean[][] iset(java.lang.String name, boolean[][] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public byte[][] iset(java.lang.String name, byte[][] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public double[][] iset(java.lang.String name, double[][] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public float[][] iset(java.lang.String name, float[][] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public int[][] iset(java.lang.String name, int[][] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public long[][] iset(java.lang.String name, long[][] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public char[][] iset(java.lang.String name, char[][] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+               public java.lang.String[][] iset(java.lang.String name, java.lang.String[][] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(value));
+                  }
+                  return value;
+               }
+
+               // update a value (inline array element versions)
+               public boolean[] aiset(java.lang.String name, boolean[] array, int i, boolean value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public byte[] aiset(java.lang.String name, byte[] array, int i, byte value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public double[] aiset(java.lang.String name, double[] array, int i, double value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public float[] aiset(java.lang.String name, float[] array, int i, float value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public int[] aiset(java.lang.String name, int[] array, int i, int value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public long[] aiset(java.lang.String name, long[] array, int i, long value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public char[] aiset(java.lang.String name, char[] array, int i, char value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public java.lang.String[] aiset(java.lang.String name, java.lang.String[] array, int i, java.lang.String value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public boolean[][] aiset(java.lang.String name, boolean[][] array, int i, boolean[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public byte[][] aiset(java.lang.String name, byte[][] array, int i, byte[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public double[][] aiset(java.lang.String name, double[][] array, int i, double[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public float[][] aiset(java.lang.String name, float[][] array, int i, float[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public int[][] aiset(java.lang.String name, int[][] array, int i, int[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public long[][] aiset(java.lang.String name, long[][] array, int i, long[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public char[][] aiset(java.lang.String name, char[][] array, int i, char[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public java.lang.String[][] aiset(java.lang.String name, java.lang.String[][] array, int i, java.lang.String[] value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+
+               public boolean[][] aaiset(java.lang.String name, boolean[][] array, int i, int j, boolean value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i][j] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public byte[][] aaiset(java.lang.String name, byte[][] array, int i, int j, byte value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i][j] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public double[][] aaiset(java.lang.String name, double[][] array, int i, int j, double value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i][j] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public float[][] aaiset(java.lang.String name, float[][] array, int i, int j, float value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i][j] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public int[][] aaiset(java.lang.String name, int[][] array, int i, int j, int value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i][j] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public long[][] aaiset(java.lang.String name, long[][] array, int i, int j, long value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i][j] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public char[][] aaiset(java.lang.String name, char[][] array, int i, int j, char value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i][j] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+               public java.lang.String[][] aaiset(java.lang.String name, java.lang.String[][] array, int i, int j, java.lang.String value) {
+                  MaSHDebuggerVar v = lookup(name);
+                  array[i][j] = value;
+                  if (v != null && (!suspended || v.stackFrame == 0)) {
+                     v.set(toString(array));
+                  }
+                  return array;
+               }
+            
+               // escape a special character
+               private java.lang.String escape(char c) {
+                  switch (c) {
+                     case '\n': return "\\n";
+                     case '\t': return "\\t";
+                     case '\'': return "\\'";
+                     case '\"': return "\\\"";
+                     case '\\': return "\\\\";
+                     default:   return "" + c;
+                  }
+               }
+               
+               // convert SIMPLE values to strings
+               public java.lang.String toString(boolean value) {
+                  return "" + value;
+               }
+               public java.lang.String toString(byte value) {
+                  return "" + value;
+               }
+               public java.lang.String toString(double value) {
+                  return "" + value;
+               }
+               public java.lang.String toString(float value) {
+                  return "" + value;
+               }
+               public java.lang.String toString(int value) {
+                  return "" + value;
+               }
+               public java.lang.String toString(long value) {
+                  return "" + value;
+               }
+               public java.lang.String toString(char value) {
+                  return "'" + escape(value) + "'";
+               }
+               public java.lang.String toString(java.lang.String value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder();
+                     sb.append("\"");
+                     for (int i = 0; i < value.length(); i++) {
+                        sb.append(escape(value.charAt(i)));
+                     }
+                     return sb.append("\"").toString();
+                  }
+               }
+               
+               // convert a ARRAYs to strings
+               public java.lang.String toString(boolean[] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(byte[] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(int[] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(long[] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(float[] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(double[] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(char[] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(java.lang.String[] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(boolean[][] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(byte[][] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(int[][] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(long[][] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(float[][] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(double[][] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(char[][] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+               public java.lang.String toString(java.lang.String[][] value) {
+                  if (value == null) {
+                     return "null";
+                  } else {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder("{");
+                     for (int i = 0; i < value.length; i++) {
+                        sb.append(toString(value[i]));
+                        if (i < value.length - 1) {
+                           sb.append(',');
+                        }
+                     }
+                     return sb.append("}").toString();
+                  }
+               }
+
+               // The MaSH program source code
+               private java.util.List<java.lang.String> source = 
+                  new java.util.ArrayList<java.lang.String>();
+
+               // Read the MaSH program source code
+               private void readSource() {
+                  if (source.size() == 0) { // so we don't do it twice
+                     try {
+                        java.util.Scanner sc = new java.util.Scanner(
+                           new java.io.File("#PROGRAM_NAME#.mash"));
+                        while (sc.hasNextLine()) {
+                           source.add(expandTabs(sc.nextLine()));
+                        }
+                        sc.close();
+                     } catch (Exception e) {
+                        java.lang.System.err.println(
+                           "MaSH debugger could not read #PROGRAM_NAME#.mash.");
+                        java.lang.System.exit(1);
+                     }
+                  }
+               }
+               
+               // expand tabs
+               private java.lang.String expandTabs(java.lang.String s) {
+                  java.lang.StringBuilder sb = new java.lang.StringBuilder();
+                  int w = 0;
+                  for (int i = 0; i < s.length(); i++) {
+                     char c = s.charAt(i);
+                     if (c == '\t') {
+                        do {
+                           sb.append(' ');
+                           w++;
+                        } while (w % 8 != 0);
+                     } else {
+                        sb.append(c);
+                        w++;
+                     }
+                  }
+                  return sb.toString();
+               }
+
+               // The frame class
+               private class DebugFrame extends javax.swing.JFrame {
+               
+                  // Boxes within which visible components laid out
+                  private javax.swing.Box mainBox = new javax.swing.Box(
+                     javax.swing.BoxLayout.Y_AXIS);
+                  private javax.swing.Box topBox = new javax.swing.Box(
+                     javax.swing.BoxLayout.X_AXIS);
+                  private javax.swing.Box botBox = new javax.swing.Box(
+                     javax.swing.BoxLayout.X_AXIS);
+                  
+                  // Display components
+                  private javax.swing.JPanel srcPanel = new 
+	             javax.swing.JPanel();
+	          private javax.swing.JScrollPane srcScrollPane = new 
+	             javax.swing.JScrollPane();
+	          private javax.swing.JEditorPane srcEditorPane = new
+	             javax.swing.JEditorPane("text/html", null);
+                  private javax.swing.JPanel varPanel = new 
+	             javax.swing.JPanel();
+	          private javax.swing.JScrollPane varScrollPane = new 
+	             javax.swing.JScrollPane();
+	          private javax.swing.JEditorPane varEditorPane = new
+	             javax.swing.JEditorPane("text/html", null);
+                  
+                  // Control components
+	          private javax.swing.JButton stepButton = 
+	             new javax.swing.JButton("Step");
+                  private javax.swing.JLabel slowLabel = 
+	             new javax.swing.JLabel("Slow");
+	          private javax.swing.JSlider speedSlider = new
+	             javax.swing.JSlider(1, 100);
+                  private javax.swing.JLabel fastLabel = 
+	             new javax.swing.JLabel("Fast");
+	          private javax.swing.JButton runButton = 
+	             new javax.swing.JButton("Run/Pause");
+	          private javax.swing.JButton quitButton = 
+	             new javax.swing.JButton("Quit");
+	          
+                  public DebugFrame() {
+                     super();
+                     // layout boxes
+                        getContentPane().add(mainBox);
+                        mainBox.add(topBox);
+                        mainBox.add(botBox);
+                     // source code display
+                        topBox.add(srcPanel);
+                        srcPanel.add(srcScrollPane);
+                        srcScrollPane.setPreferredSize(
+                           new java.awt.Dimension(400, 400));
+                        srcScrollPane.setViewportView(srcEditorPane);
+                        srcEditorPane.setEditable(false);
+                     // variables display
+                        topBox.add(varPanel);
+                        varPanel.add(varScrollPane);
+                        varScrollPane.setPreferredSize(
+                           new java.awt.Dimension(400, 400));
+                        varScrollPane.setViewportView(varEditorPane);
+                        varEditorPane.setEditable(false);
+                     // controls
+                        //stepButton.setDefaultCapable(false);
+                        //stepButton.setFocusPainted(false);
+                        //quitButton.setDefaultCapable(false);
+                        botBox.add(stepButton);
+		        stepButton.addActionListener(
+		           new java.awt.event.ActionListener() {
+                              public void actionPerformed(
+                                 java.awt.event.ActionEvent e) {
+		                 step();
+			      }
+   		           });                     
+                        botBox.add(slowLabel);
+                        botBox.add(speedSlider);
+                        speedSlider.setValue(5); // 2s
+                        setDelay(speedSlider.getValue());
+                        speedSlider.addChangeListener(
+                           new javax.swing.event.ChangeListener() {
+			      public void stateChanged(
+			         javax.swing.event.ChangeEvent e) {
+			         setDelay(speedSlider.getValue());
+			      }
+		           });
+                        botBox.add(fastLabel);
+                        botBox.add(runButton);
+		        runButton.addActionListener(
+		           new java.awt.event.ActionListener() {
+                              public void actionPerformed(
+                                 java.awt.event.ActionEvent e) {
+		                 runPause();
+			      }
+   		           });                     
+                        botBox.add(quitButton);
+		        quitButton.addActionListener(
+		           new java.awt.event.ActionListener() {
+                              public void actionPerformed(
+                                 java.awt.event.ActionEvent e) {
+		                 java.lang.System.exit(0);
+			      }
+   		           });
+                     // frame
+                        setTitle("MaSH Debugger: #PROGRAM_NAME#");
+                        setDefaultCloseOperation(EXIT_ON_CLOSE);
+                        setResizable(false);
+                        pack();
+                  } // end constructor
+                  
+                  // display source, with a marker at (line, col).
+                  // (-1,_) means at end of a no-method program.
+                  // tag is a string so display at the marker, e.g.
+                  // true/false at a testpoint. It is usually null.
+                  public void displaySource(int line, int col, java.lang.String tag) {
+                     int nominalWidth = 40;
+                     java.lang.String marker = "";
+                     if (tag == null) {
+                        marker = "<font color=\"blue\">&#x25BA;</font>";
+                     } else {
+                        marker = "<font color=\"blue\">" + tag + "&#x25BA;</font>";
+                     }
+                     int count = 0; // source chars
+                     int markerPos = 0;
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder()
+                        .append("<html><body><pre>");
+                     for (int i = 0; i < source.size(); i++) {
+                        java.lang.String s = source.get(i);
+                        if (i == line) {
+                           appendHTMLSafe(sb, s.substring(0,col));
+                           sb.append(marker);
+                           count += col + 1;
+                           if (s.length() < nominalWidth 
+                              || col <= nominalWidth / 3) {
+                              markerPos = count - col;
+                           } else {
+                              markerPos = count + 
+                                 Math.min(nominalWidth, s.length() - col);
+                           }
+                           appendHTMLSafe(sb, s.substring(col));
+                           count += s.length() - col;
+                        } else {
+                           appendHTMLSafe(sb, s);
+                           count += s.length();
+                        }
+                        sb.append('\n');
+                        count++;
+                     }
+                     if (line == -1) {
+                        sb.append(marker);
+                        count++;
+                        markerPos = count;
+                     } 
+                     sb.append("</pre></body></html>");
+                     srcEditorPane.setText(sb.toString());
+                     srcEditorPane.setCaretPosition(markerPos);
+                     lastLine = line; lastCol = col;
+                  }
+
+                  // display source, with a marker at (line, col).
+                  // (-1,_) means at end of a no-method program.
+                  // p is a boolean value to tag the marker.
+                  public void displaySource(int line, int col, boolean p) {
+                     displaySource(line, col, "" + p);
+                  }
+                  
+                  // display source, with a marker at (line, col).
+                  // (-1,_) means at end of a no-method program.
+                  public void displaySource(int line, int col) {
+                     displaySource(line, col, null);
+                  }
+                  
+                  // display variables stack
+                  public void displayVars() {
+                     java.lang.StringBuilder sb = new java.lang.StringBuilder().append("<html>" + 
+                        "<body><table><tr><th align=\"left\">scope</th>" + 
+                        "<th align=\"left\">name</th><th align=\"left\">type</th>" + 
+                        "<th align=\"left\">value</th></tr>");
+                     for (int i = 0; i < stack.size(); i++) {
+                        MaSHDebuggerVar v = stack.elementAt(i);
+                        sb.append("<tr><td>");
+                        if (v.freshness >= 2) 
+                           sb.append("<font color=\"green\">");
+                        sb.append(v.stackFrame); 
+                        sb.append('-'); 
+                        sb.append(v.kind); 
+                        if (v.freshness >= 2) 
+                           sb.append("</font>");
+                        sb.append("</td><td>");
+                        if (v.freshness >= 2) 
+                           sb.append("<font color=\"green\">");
+                        sb.append("<tt>"); 
+                        sb.append(v.name); 
+                        sb.append("</tt>");
+                        if (v.freshness >= 2) 
+                           sb.append("</font>");
+                        sb.append("</td><td>");
+                        if (v.freshness >= 2) 
+                           sb.append("<font color=\"green\">");
+                        sb.append("<tt>"); 
+                        sb.append(v.type); 
+                        sb.append("</tt>");
+                        if (v.freshness >= 2) 
+                           sb.append("</font>");
+                        sb.append("</td><td>");
+                        if (v.value.equals("undefined"))
+                           sb.append("<font color=\"red\">");
+                        else if (v.freshness >= 1) 
+                           sb.append("<font color=\"green\">");
+                        sb.append("<tt>"); 
+                        appendHTMLSafe(sb, v.value); 
+                        sb.append("</tt>");
+                        if (v.freshness >= 1 || v.value.equals("undefined")) 
+                           sb.append("</font>");
+                        sb.append("</td></tr>");
+                        v.reset();
+                     }
+                     sb.append("</table></code></body></html>");
+                     varEditorPane.setText(sb.toString());
+                  }
+                  
+                  // update the controls to those normally available
+                  public void updateControls() {
+                     stepButton.setEnabled(execMode < 2);
+                     speedSlider.setEnabled(execMode < 2);
+                     runButton.setEnabled(execMode < 2);
+                     quitButton.setEnabled(true);
+                  }
+                  
+                  // disable the controls that should not be available when the
+                  // host program is running (e.g. a read)(
+                  public void disableStepRun() {
+                     stepButton.setEnabled(false);
+                     runButton.setEnabled(false);
+                  }
+                  
+                  // encode html specials as you add a string to a builder
+                  // returns actual # chars appended
+                  private void appendHTMLSafe(java.lang.StringBuilder sb, java.lang.String s) {
+                     for (int i = 0; i < s.length(); i++) {
+                        char c = s.charAt(i);
+                        switch (c) {
+                           case '<': sb.append("&lt;"); break;
+                           case '>': sb.append("&gt;"); break;
+                           case '&': sb.append("&amp;"); break;
+                           case '"': sb.append("&quot;"); break;
+                           default : sb.append(c);
+                        }
+                     }
+                  }
+               
+               } // end class: DebugFrame
+
+               // The debugger window
+               private DebugFrame window = new DebugFrame();
+
+	       // run speed
+	       private final int MAX_DELAY = 10000; // 10s
+	       private int delay; // MAX_DELAY / [1..100] = [10000..100]
+	       
+	       // update delay from slider value
+	       private void setDelay(int sliderValue) {
+	          delay = MAX_DELAY / sliderValue;
+	       }
+	       
+               // execution mode
+               //   0 = single step
+               //   1 = running
+               //   2 = program is finished
+               private int execMode = 0;
+
+               // true = don't proceed if in single step mode
+               private boolean block = true;
+               
+               // do one step or revert to step mode
+               private void step() {
+                  
+                  if (execMode == 0) {
+                     block = false;
+                  } else {
+                     execMode = 0;
+                     block = true;
+                  }
+               }
+               
+               // toggle run/Pause
+               private void runPause() {
+                  
+                  execMode = 1 - execMode;
+                  block = true;
+               }
+               
+               // wait until allowed to proceed by stepping or delay
+               private void hold() {
+                  if (!java.lang.Thread.currentThread().getName().equals("main"))
+                     return;
+                  switch (execMode) {
+                     case 0 : 
+                        while (block && execMode < 1) {
+                           java.lang.Thread.yield();
+                        }
+                        block = true;
+                        break;
+                     case 1 :
+                        try {
+                           java.lang.Thread.sleep(delay);
+                        } catch (Exception e) {
+                        }
+                        break;
+                     default :
+                        return;
+                  }
+                  window.disableStepRun();
+               }
+            
+               // suspend flag
+               private boolean suspended = false;
+               
+               // suspend
+               public void suspend() {
+                  suspended = true;
+               }
+               
+               // unsuspend
+               public void resume() {
+                  suspended = false;
+               }
+               
+               // the last position drawn
+               private int lastLine = -2, lastCol = -2;
+               
+               // open the debugger window
+               public void open() {
+                  if (!suspended) {
+                     
+                     readSource();
+                     window.setVisible(true);
+                  }
+               }
+               
+               // update the debugger display and wait for step or delay
+               public void checkpoint(int line, int column) {
+                  if (!suspended) {
+                     
+                     window.displaySource(line, column);
+                     window.displayVars();
+                     window.updateControls();
+                     hold();
+                  }
+               }
+               
+               // update the debugger display and wait for step or delay
+               // in a condition
+               public boolean testpoint(int line, int column, boolean p) {
+                  if (!suspended) {
+                     
+                     window.displaySource(line, column, p);
+                     window.displayVars();
+                     window.updateControls();
+                     hold();
+                  }
+                  return p;
+               }
+               
+               // checkpoint where the loction is after the last character in
+               // the program
+               public void checkpoint() {
+                  if (!suspended) {
+                     
+                     window.displaySource(-1, -1, "FINISHED");
+                     window.displayVars();
+                     window.updateControls();
+                  }
+               }
+              
+               // the program is finished.
+               public void close() {
+                  if (!suspended) {
+                     
+                     execMode = 2;
+                     window.displaySource(lastLine, lastCol, "FINISHED");
+                     window.updateControls();
+                  }
+               }
+
+               // the program is finished.
+               public void update() {
+                  if (!suspended) {
+                     
+                     //window.displaySource(lastLine, lastCol, "FINISHED");
+                     window.displayVars();
+                     //window.updateControls();
+                  }
+               }
+
+            } // end class: MaSHDebuggerStack
+
+            // The instance of the debugger stack
+            private static MaSHDebuggerStack mash_debugger = 
+               new MaSHDebuggerStack();
+
+         #}
+         
+      } // end debug member
+   
+   } // end section: Debugger
+   
+}

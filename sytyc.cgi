@@ -110,7 +110,7 @@ runJava source = do
                                       ++ err_msg''
               (_, _) -> out_msg''
   removeFile tmpName
-  removeFile $ replace ".java" ".class" tmpName
+  -- removeFile $ replace ".java" ".class" tmpName
   return msg
   
 
@@ -119,23 +119,43 @@ runMash :: String -> IO String
 runMash source = do
   createDirectoryIfMissing False tmp_dir
   (tmpName, tmpHandle) <- openTempFile tmp_dir "Main.mash"
-  hPutStr tmpHandle source'
+  let className = replace "tmp\\" "" 
+                $ replace "tmp/" "" 
+                  tmpName
+  hPutStr tmpHandle source
   hClose tmpHandle
-  (exitcode, out_msg, err_msg) <- readProcessWithExitCode
-                                  "mashc" [tmpName] []
-  let msg = case exitcode of
-              ExitFailure code -> compiler_error
-                where
-                  compiler_error = replace (tmpName ++ ":") "Line "
-                                  $ nToBR $ -- "Compilation failed with " 
-                                           -- ++ (show exitcode)
-                                           -- ++ "\n"
-                                           out_msg
-                                           ++ "\n"
-                                           ++ err_msg
-              ExitSuccess -> out_msg
+  (Just hin, Just hout, Just herr, hJava) <-
+    createProcess (proc "mashc" [className])
+                    { cwd = Just tmp_dir
+                    , std_in = CreatePipe
+                    , std_err = CreatePipe
+                    , std_out = CreatePipe
+                    }
+  hClose hin -- TODO: add stdin based on problem
+  out_msg <- hGetContents hout
+  err_msg <- hGetContents herr
+  -- Here we _force_ the file to be read.
+  -- Dark magic of Haskell
+  rnf out_msg `seq` hClose hout
+  rnf err_msg `seq` hClose herr
+  let out_msg' = replace className "Main" out_msg
+  let err_msg' = replace className "Main" err_msg
+  exitcode <- waitForProcess hJava
+  msg <- case exitcode of
+           ExitFailure code -> return compiler_error
+             where
+               compiler_error = replace (className ++ ":") "Line "
+                                $ nToBR $ -- "Compilation failed with " 
+                                         -- ++ (show exitcode)
+                                         -- ++ "\n"
+                                         out_msg
+                                         ++ className
+                                         ++ "\n"
+                                         ++ err_msg
+           ExitSuccess -> do
+             java_source <- exReadFile $ replace ".mash" ".java" tmpName 
+             runJava java_source
   removeFile tmpName
-  removeFile $ replace ".java" ".class" tmpName
   return msg
     
 ------------------------------------------------------------------
@@ -153,6 +173,7 @@ cgiMain = do
   result <- case lang' of
               "haskell" -> liftIO $ runghc r'
               "java"    -> liftIO $ runJava r'
+              "mash"    -> liftIO $ runMash r'
               _         -> return "Don't forget to choose a language."
   
   result_partial <- liftIO $ parseResultTemplate $ nToBR result
