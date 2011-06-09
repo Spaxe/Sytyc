@@ -112,7 +112,32 @@ runJava source = do
   removeFile tmpName
   removeFile $ replace ".java" ".class" tmpName
   return msg
+  
 
+-- | Runs a Mash program. Delegates most of the work to runJava.
+runMash :: String -> IO String
+runMash source = do
+  createDirectoryIfMissing False tmp_dir
+  (tmpName, tmpHandle) <- openTempFile tmp_dir "Main.mash"
+  hPutStr tmpHandle source'
+  hClose tmpHandle
+  (exitcode, out_msg, err_msg) <- readProcessWithExitCode
+                                  "mashc" [tmpName] []
+  let msg = case exitcode of
+              ExitFailure code -> compiler_error
+                where
+                  compiler_error = replace (tmpName ++ ":") "Line "
+                                  $ nToBR $ -- "Compilation failed with " 
+                                           -- ++ (show exitcode)
+                                           -- ++ "\n"
+                                           out_msg
+                                           ++ "\n"
+                                           ++ err_msg
+              ExitSuccess -> out_msg
+  removeFile tmpName
+  removeFile $ replace ".java" ".class" tmpName
+  return msg
+    
 ------------------------------------------------------------------
 -- Entry functions
 cgiMain :: CGI CGIResult
@@ -128,7 +153,7 @@ cgiMain = do
   result <- case lang' of
               "haskell" -> liftIO $ runghc r'
               "java"    -> liftIO $ runJava r'
-              _         -> return "Did you forget to choose a language?"
+              _         -> return "Don't forget to choose a language."
   
   result_partial <- liftIO $ parseResultTemplate $ nToBR result
   problem_partial <- liftIO $ parseMarkdownFile $ problem_dir ++ problem_file
