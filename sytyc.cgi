@@ -122,6 +122,7 @@ runMash source = do
   let className = replace "tmp\\" "" 
                 $ replace "tmp/" "" 
                   tmpName
+  let className' = replace ".mash" "" className
   hPutStr tmpHandle source
   hClose tmpHandle
   (Just hin, Just hout, Just herr, hJava) <-
@@ -154,7 +155,7 @@ runMash source = do
                                          ++ err_msg
            ExitSuccess -> do
              java_source <- exReadFile $ replace ".mash" ".java" tmpName 
-             runJava java_source
+             runJava $ replace className' "Main" java_source
   removeFile tmpName
   return msg
     
