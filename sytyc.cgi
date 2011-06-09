@@ -44,12 +44,13 @@ runghc source = do
                                          ++ out_msg
                                          ++ "\n"
                                          ++ err_msg)      
-  removeDirectoryRecursive tmp_dir
+  removeFile tmpName
   return msg
   
 -- Java
 -- The source code must have "public class Main".
 -- Pain in the ass.
+-- "why do you hate your sanity?" ~ Nick Hodge, Microsoft Australia
 runJava :: String -> IO String
 -- Java does not generate .class files if the source is empty. Annoying.
 runJava "" = return ""
@@ -108,7 +109,8 @@ runJava source = do
                                       ++ "\n" 
                                       ++ err_msg''
               (_, _) -> out_msg''
-  removeDirectoryRecursive tmp_dir
+  removeFile tmpName
+  removeFile $ replace ".java" ".class" tmpName
   return msg
 
 ------------------------------------------------------------------
@@ -126,7 +128,7 @@ cgiMain = do
   result <- case lang' of
               "haskell" -> liftIO $ runghc r'
               "java"    -> liftIO $ runJava r'
-              _         -> return ""
+              _         -> return "Did you forget to choose a language?"
   
   result_partial <- liftIO $ parseResultTemplate $ nToBR result
   problem_partial <- liftIO $ parseMarkdownFile $ problem_dir ++ problem_file
