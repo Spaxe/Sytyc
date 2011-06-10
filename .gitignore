@@ -4,5 +4,5 @@ tmp/*
 src/*.hi
 src/*.o
 *.exe
-./*.cgi
+*.cgi
 *.class
