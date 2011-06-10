@@ -1,7 +1,7 @@
 Overview
 ========
 Sytyc is a web-based problem database with a compiler on the server side.
-Only Andrew Rock's #[MaSH compiler](http://www.ict.griffith.edu.au/arock/MaSH/index.html)
+Only Andrew Rock's [MaSH compiler](http://www.ict.griffith.edu.au/arock/MaSH/index.html)
 is supported at the moment, but Sytyc will happily run any compiler that the
 server can run, if configured correctly.
 
