@@ -19,6 +19,7 @@ module Sytyc
   , version
   , build_time
   , footer_text
+  , problems_html
   ) where
   
 import Prelude hiding (catch)
@@ -50,6 +51,7 @@ problem_file = "description.md"
 result_file = "result.md"
 
 template_html = template_dir ++ "template.html"
+problems_html = template_dir ++ "problems.html"
 problem_html = template_dir ++ "problem.html"
 
 ------------------------------------------------------------------
