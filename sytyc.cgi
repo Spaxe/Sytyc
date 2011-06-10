@@ -49,7 +49,7 @@ runghc source input = do
 -- "why do you hate your sanity?" ~ Nick Hodge, Microsoft Australia
 runJava :: String -> String -> IO String
 -- Java does not generate .class files if the source is empty. Annoying.
-runJava "" = return ""
+runJava "" _ = return ""
 runJava source input = do
   createDirectoryIfMissing False tmp_dir
   (tmpName, tmpHandle) <- openTempFile tmp_dir "Main.java"
@@ -144,7 +144,7 @@ runMash source input = do
                                         ++ err_msg
            ExitSuccess -> do
              java_source <- exReadFile $ replace ".mash" ".java" tmpName 
-             runJava $ (replace className' "Main" java_source) input
+             runJava (replace className' "Main" java_source) input
   removeFile tmpName
   return msg
   
@@ -156,7 +156,7 @@ verifyProgram source language inputs outputs = do
                    "haskell" -> runghc
                    "java"    -> runJava
                    _         -> runMash -- Defaults to mash
-  let r = verifyProgram' source compiler inputs outputs True
+  r <- verifyProgram' source compiler inputs outputs True
   let correctness = case r of
                       True -> "Correct"
                       _    -> "Incorrect"
@@ -171,7 +171,7 @@ verifyProgram source language inputs outputs = do
       verifyProgram' _ _ _ _ False = return False
       verifyProgram' _ _ [] _ correctness = return correctness
       verifyProgram' _ _ _ [] correctness = return correctness
-      verifyProgram' source compiler i:inputs o:outputs correctness = do
+      verifyProgram' source compiler (i:inputs) (o:outputs) correctness = do
         input <- exReadFile i
         r <- compiler source input
         answer <- exReadFile o
@@ -186,8 +186,10 @@ getProblemIO problem = do
   let this_problem_dir = problem_dir ++ problem ++ "/"
   let p_input = this_problem_dir ++ "input/"
   let p_output = this_problem_dir ++ "output/"
-  inputs <- map ((++) p_input) $ getDirectoryContents this_problem_dir
-  outputs <- map ((++) p_output) $ getDirectoryContents this_problem_dir
+  input_contents <- getDirectoryContents this_problem_dir
+  output_contents <- getDirectoryContents this_problem_dir
+  let inputs = map ((++) p_input) input_contents
+  let outputs = map ((++) p_output) output_contents 
   return (inputs, outputs)
       
 ------------------------------------------------------------------
@@ -213,7 +215,7 @@ cgiMain = do
   -}
   -- And comment these ones out.
   let problem_name = "0001_Summation"
-  (inputs, outputs) = getProblemIO problem_name
+  (inputs, outputs) <- liftIO $ getProblemIO problem_name
   result <- case r' of
               "" -> return ""
               _  -> liftIO $ verifyProgram r' "mash" inputs outputs
