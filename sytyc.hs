@@ -14,6 +14,7 @@ module Sytyc
   , result_file
   , template_html
   , problem_html
+  , problem_file
   , prog_name
   , version
   , build_time
@@ -43,6 +44,8 @@ supported_languages = [ "haskell"
                       , "java"
                       , "mash"
                       ]
+                      
+problem_file = "description.md"
                       
 result_file = "result.md"
 
@@ -97,7 +100,6 @@ parseResultTemplate result
 -- | Takes a string and replaces all newline characters \n with <br>.
 nToBR :: String -> String
 nToBR = replace "\n" "<br>"
-
 
 ------------------------------------------------------------------
 -- Extra stuff

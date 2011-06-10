@@ -1,11 +1,13 @@
 Overview
 ========
 Sytyc is a web-based problem database with a compiler on the server side.
+Only Andrew Rock's #[MaSH compiler](http://www.ict.griffith.edu.au/arock/MaSH/index.html)
+is supported at the moment, but Sytyc will happily run any compiler that the
+server can run, if configured correctly.
 
-A list of problems is presented to the user, from which they can pick a
-problem to work on, and submit their source code. The code is (unsafely)
-compiled server-side, and the result is then printed back onto the web
-page. Kudos is given when the program computes the correct results.
+Screenshot
+----------
+
 
 Github repository: https://github.com/SpaXe/Sytyc
 

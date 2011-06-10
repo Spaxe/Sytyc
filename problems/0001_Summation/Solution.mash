@@ -1,0 +1,10 @@
+import console;
+
+void main()
+{
+  long total = 0;
+  while (isNextInt()) {
+    total = total + readInt();
+  }
+  print(total);
+}
