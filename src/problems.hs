@@ -9,13 +9,22 @@ import Sytyc
 cgiMain :: CGI CGIResult
 cgiMain = do
   template <- liftIO $ exReadFile template_html
-  problems_partial <- liftIO $ exReadFile problems_html
   footer <- liftIO $ footer_text
+  problem_list <- liftIO $ getProblemList
+  let p = unlines $ map wrapLi problem_list
+  problems_partial <- liftIO
+                      $ parseTemplateFile [("PROBLEM_LIST", p)] problems_html
   let page = parseTemplate [ ("TEMPLATE_CONTENT", problems_partial)
                            , ("NAME", prog_name)
                            , ("FOOTER", footer)] 
                            template
   output page
+    where
+      wrapLi (i, s) = "<a href=\"problem.cgi?p=" 
+                      ++ s
+                      ++ "\"><li><p>" 
+                      ++ s 
+                      ++ "</p></li></a>"
 
   
 main :: IO ()

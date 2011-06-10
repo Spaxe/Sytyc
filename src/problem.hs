@@ -236,7 +236,10 @@ cgiMain = do
               _         -> return "Don't forget to choose a language."
   -}
   -- And comment these ones out. 
-  let problem_name = "0001_Summation"
+  problem_number <- getInput "p"
+  let problem_name = case problem_number of
+                       Just a -> a
+                       Nothing -> "null"
   (inputs, outputs) <- liftIO $ getProblemIO problem_name
   result <- case r' of
               "" -> return ""
@@ -251,7 +254,7 @@ cgiMain = do
   this_page <- liftIO $ exReadFile problem_html
   footer <- liftIO $ footer_text
   let page = parseTemplate [ ("TEMPLATE_CONTENT", this_page)
-                           , ("NAME", prog_name)
+                           , ("NAME", prog_name ++ " " ++ p)
                            , ("FOOTER", footer)
                            ] template
   let template_strings = [ ("PROBLEM", problem_partial)

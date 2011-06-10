@@ -1,3 +1,6 @@
 # Stuff we don't want to be version controlled.
 tmp/*
 !tmp/*.mashenv
+*.hi
+*.o
+*.exe

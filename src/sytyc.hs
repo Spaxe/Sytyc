@@ -20,6 +20,7 @@ module Sytyc
   , build_time
   , footer_text
   , problems_html
+  , getProblemList
   ) where
   
 import Prelude hiding (catch)
@@ -31,6 +32,8 @@ import Text.Pandoc.Shared (defaultWriterOptions)
 import Text.Pandoc.Parsing (defaultParserState)
 import Data.String.Utils (replace)
 import System.Time (getClockTime, toCalendarTime, calendarTimeToString)
+import System.Directory (getDirectoryContents)
+import Data.List (delete)
 
 ------------------------------------------------------------------
 -- Constants
@@ -102,6 +105,15 @@ parseResultTemplate result
 -- | Takes a string and replaces all newline characters \n with <br>.
 nToBR :: String -> String
 nToBR = replace "\n" "<br>"
+
+------------------------------------------------------------------
+-- Problem discovery
+getProblemList :: IO [(Int, String)]
+getProblemList = do
+  problems <- getDirectoryContents problem_dir
+  let problems' = delete "." $ delete ".." problems 
+  let result = zip [1..] problems'
+  return result
 
 ------------------------------------------------------------------
 -- Extra stuff

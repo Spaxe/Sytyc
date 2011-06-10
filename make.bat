@@ -15,5 +15,5 @@ mv src/feedback.exe feedback.cgi
 mv src/faq.exe faq.cgi
 echo "Cleaning up ..."
 cd src
-rm *.o *.hi
+# rm *.o *.hi
 cd ..
