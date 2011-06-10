@@ -49,8 +49,8 @@ problem_file = "description.md"
                       
 result_file = "result.md"
 
-template_html = "template.html"
-problem_html = "problem.html"
+template_html = template_dir ++ "template.html"
+problem_html = template_dir ++ "problem.html"
 
 ------------------------------------------------------------------
 -- Page construction

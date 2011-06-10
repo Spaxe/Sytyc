@@ -53,15 +53,16 @@ body {
   font-size: 16px;
   background: #fdf6e3;
   color: #657b83;
+  line-height: 20px;
 }
 
 a, a:visited, a:active {
   text-decoration: none;
-  color: #93a1a1;
+  color: #b58900;
 }
 
 a:hover {
-  color: inherit;
+  color: #cb4b16;
 }
 
 #wrapper {

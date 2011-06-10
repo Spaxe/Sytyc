@@ -8,7 +8,7 @@ import Sytyc
  
 ------------------------------------------------------------------
 -- Constants
-index_file = "index.md"
+index_file = "faq.md"
 
 cgiMain :: CGI CGIResult
 cgiMain = do

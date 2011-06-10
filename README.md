@@ -5,11 +5,12 @@ Only Andrew Rock's #[MaSH compiler](http://www.ict.griffith.edu.au/arock/MaSH/in
 is supported at the moment, but Sytyc will happily run any compiler that the
 server can run, if configured correctly.
 
+Github repository: https://github.com/SpaXe/Sytyc
+
 Screenshot
 ----------
 
 
-Github repository: https://github.com/SpaXe/Sytyc
 
 Credits
 -------
@@ -28,16 +29,22 @@ Sytyc is not thread-safe. You should not compile and run it with -thread flag.
 Dependencies
 ------------
 Haskell dependencies:
+
   * GHC version >= 7.0.3. As of Feb 2011, the official Haskell Platform 
   supports GHC 7.0.3. Sytyc was compiled against the GHC libraries.
+  
   * pandoc-1.8
+  
   * missingH-1.1.0.3
 
 Server dependencies:
+
   * Apache, or other server programs that support CGI.
 
 Other dependencies:
+
   * Java SDK SE 6
+  
   * MaSH compiler http://www.ict.griffith.edu.au/arock/MaSH/index.html
 
 Customisation
