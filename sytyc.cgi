@@ -12,7 +12,8 @@ import System.Directory (removeFile, createDirectoryIfMissing,
 import System.Exit (ExitCode(..))
 import Network.CGI (CGI, CGIResult, runCGI, handleErrors, output, getInput,
                     liftIO)
-import Data.String.Utils (replace)
+import Data.String.Utils (replace, strip)
+import Data.List (delete)
 import Sytyc
 
 ------------------------------------------------------------------
@@ -78,13 +79,14 @@ runJava source input = do
                   }
   hPutStr hin input
   hFlush hin
+  hClose hin
   out_msg' <- hGetContents hout
   err_msg' <- hGetContents herr
   -- Here we _force_ the file to be read.
   -- Dark magic of Haskell
   rnf out_msg' `seq` hClose hout
   rnf err_msg' `seq` hClose herr
-  hClose hin
+  
   let out_msg'' = replace className "Main" out_msg'
   let err_msg'' = replace className "Main" err_msg'
   exitcode' <- waitForProcess hJava
@@ -156,10 +158,11 @@ verifyProgram source language inputs outputs = do
                    "haskell" -> runghc
                    "java"    -> runJava
                    _         -> runMash -- Defaults to mash
-  r <- verifyProgram' source compiler inputs outputs True
+  -- r <- verifyProgram' source compiler inputs outputs True
+  r <- verifyProgram' source compiler [(head inputs)] [(head outputs)] True
   let correctness = case r of
                       True -> "Correct"
-                      _    -> "Incorrect"
+                      _    -> (unlines inputs) ++ "\n\n" ++ (unlines outputs)
   return correctness
     where
       verifyProgram' :: String
@@ -173,10 +176,13 @@ verifyProgram source language inputs outputs = do
       verifyProgram' _ _ _ [] correctness = return correctness
       verifyProgram' source compiler (i:inputs) (o:outputs) correctness = do
         input <- exReadFile i
-        r <- compiler source input
+        let input' = strip input
+        r <- rnf input' `seq` compiler source input'
+        let r' = strip r
         answer <- exReadFile o
+        let answer' = strip answer
         verifyProgram' source compiler inputs outputs 
-                                                $ (r == answer) && correctness 
+                                              $ (r' == answer') && correctness 
       
       
 -- | Given a problem name, finds all of its test inputs and outputs and return
@@ -186,10 +192,12 @@ getProblemIO problem = do
   let this_problem_dir = problem_dir ++ problem ++ "/"
   let p_input = this_problem_dir ++ "input/"
   let p_output = this_problem_dir ++ "output/"
-  input_contents <- getDirectoryContents this_problem_dir
-  output_contents <- getDirectoryContents this_problem_dir
-  let inputs = map ((++) p_input) input_contents
-  let outputs = map ((++) p_output) output_contents 
+  input_contents <- getDirectoryContents p_input
+  output_contents <- getDirectoryContents p_output
+  let input_contents' = delete "." $ delete ".." input_contents
+  let output_contents' = delete "."  $ delete ".." output_contents
+  let inputs = map ((++) p_input) input_contents'
+  let outputs = map ((++) p_output) output_contents'
   return (inputs, outputs)
       
 ------------------------------------------------------------------
