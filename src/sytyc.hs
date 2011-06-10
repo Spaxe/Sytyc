@@ -33,7 +33,7 @@ import Text.Pandoc.Parsing (defaultParserState)
 import Data.String.Utils (replace)
 import System.Time (getClockTime, toCalendarTime, calendarTimeToString)
 import System.Directory (getDirectoryContents)
-import Data.List (delete)
+import Data.List (delete, sort)
 
 ------------------------------------------------------------------
 -- Constants
@@ -108,13 +108,11 @@ nToBR = replace "\n" "<br>"
 
 ------------------------------------------------------------------
 -- Problem discovery
-getProblemList :: IO [(Int, String)]
+getProblemList :: IO [String]
 getProblemList = do
   problems <- getDirectoryContents problem_dir
-  let problems' = delete "." $ delete ".." problems 
-  let result = zip [1..] problems'
-  return result
-
+  return $ sort $ delete "." $ delete ".." problems 
+  
 ------------------------------------------------------------------
 -- Extra stuff
 build_time :: IO String

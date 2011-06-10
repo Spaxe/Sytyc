@@ -20,11 +20,11 @@ cgiMain = do
                            template
   output page
     where
-      wrapLi (i, s) = "<a href=\"problem.cgi?p=" 
-                      ++ s
-                      ++ "\"><li><p>" 
-                      ++ s 
-                      ++ "</p></li></a>"
+      wrapLi s = "<a href=\"problem.cgi?p=" 
+              ++ s
+              ++ "\"><li><p>" 
+              ++ s 
+              ++ "</p></li></a>"
 
   
 main :: IO ()

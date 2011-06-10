@@ -90,21 +90,23 @@ runJava source input = do
   let out_msg'' = replace className "Main" out_msg'
   let err_msg'' = replace className "Main" err_msg'
   exitcode' <- waitForProcess hJava
-  let msg = case (exitcode, exitcode') of
-              (ExitFailure code, _) -> compiler_error
-                where
-                  compiler_error = replace (tmpName ++ ":") "Line "
+  msg <- case (exitcode, exitcode') of
+           (ExitFailure code, _) -> do
+             return compiler_error
+               where
+                 compiler_error = replace (tmpName ++ ":") "Line "
                                   $ nToBR $ out_msg
-                                          ++ "\n"
-                                          ++ err_msg
-              (ExitSuccess, ExitFailure code) -> runtime_msg
-                where 
-                  runtime_msg = nToBR $ out_msg''
-                                      ++ "\n" 
-                                      ++ err_msg''
-              (_, _) -> out_msg''
+                                        ++ "\n"
+                                        ++ err_msg
+           (ExitSuccess, ExitFailure code) -> do
+             removeFile $ replace ".java" ".class" tmpName
+             return runtime_msg
+               where 
+                 runtime_msg = nToBR $ out_msg''
+                                     ++ "\n" 
+                                     ++ err_msg''
+           (_, _) -> return out_msg''
   removeFile tmpName
-  removeFile $ replace ".java" ".class" tmpName
   return msg
   
 
@@ -146,11 +148,12 @@ runMash source input = do
                                         ++ err_msg
            ExitSuccess -> do
              java_source <- exReadFile $ replace ".mash" ".java" tmpName 
-             runJava 
+             r <- runJava 
                (replace ("class " ++ className') "class Main" java_source)
                input
+             removeFile $ replace ".mash" ".java" tmpName
+             return r
   removeFile tmpName
-  removeFile $ replace ".mash" ".java" tmpName
   return msg
   
 ------------------------------------------------------------------
@@ -254,12 +257,13 @@ cgiMain = do
   this_page <- liftIO $ exReadFile problem_html
   footer <- liftIO $ footer_text
   let page = parseTemplate [ ("TEMPLATE_CONTENT", this_page)
-                           , ("NAME", prog_name ++ " " ++ p)
+                           , ("NAME", prog_name)
                            , ("FOOTER", footer)
                            ] template
   let template_strings = [ ("PROBLEM", problem_partial)
                          , ("RESULT_TEMPLATE", result_partial)
                          , ("SOURCE_CODE", r')
+                         , ("PROBLEM_NAME", problem_name)
                          ]
   output $ parseTemplate template_strings page
 

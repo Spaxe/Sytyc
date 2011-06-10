@@ -3,7 +3,7 @@ import console;
 
 void main()
 {
-  int count = (int)ceil(random() * 100);
+  int count = (int)ceil(random() * 1000);
   for (int i = 0; i < count; i = i + 1)
-    println((int)floor(random() * 1001));
+    println((int)floor(random() * 1000001));
 }

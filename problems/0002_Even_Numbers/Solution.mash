@@ -4,7 +4,8 @@ void main()
 {
   long total = 0;
   while (isNextInt()) {
-    total = total + readInt();
+    if (readInt() % 2 == 0)
+      total = total + 1;
   }
   print(total);
 }
