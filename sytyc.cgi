@@ -104,7 +104,7 @@ runJava source input = do
                                       ++ err_msg''
               (_, _) -> out_msg''
   removeFile tmpName
-  -- removeFile $ replace ".java" ".class" tmpName
+  removeFile $ replace ".java" ".class" tmpName
   return msg
   
 
@@ -146,8 +146,11 @@ runMash source input = do
                                         ++ err_msg
            ExitSuccess -> do
              java_source <- exReadFile $ replace ".mash" ".java" tmpName 
-             runJava (replace className' "Main" java_source) input
+             runJava 
+               (replace ("class " ++ className') "class Main" java_source)
+               input
   removeFile tmpName
+  removeFile $ replace ".mash" ".java" tmpName
   return msg
   
 ------------------------------------------------------------------
@@ -178,14 +181,14 @@ verifyProgram source language inputs outputs = do
       verifyProgram' source compiler (i:inputs) (o:outputs) m correctness = do
         input <- exReadFile i
         let input' = strip input
-        r <- rnf input' `seq` compiler source input'
+        r <- compiler source input'
         let r' = strip r
         answer <- exReadFile o
         let answer' = strip answer
         let result = (r' == answer') && correctness
         let msg = case result of 
                     True -> ""
-                    _    -> "Incorrect result:\n"
+                    _    -> "Incorrect.\n\nYour result:\n"
                             ++ r'
                             ++ "\n\n"
                             ++ "Expected result:\n"
@@ -219,20 +222,20 @@ cgiMain = do
   let r' = case r of
              Just a -> a
              Nothing -> ""
-  -- Uncomment the following lines to support other languages.
-  -- See the documentation for more instructions.
+  -- Uncomment the following lines to support other languages. 
+  -- See the documentation for more instructions. Warning, untested.
   {-
   lang <- getInput "language"
   let lang' = case lang of
                 Just a -> a
                 Nothing -> ""
   result <- case lang' of
-              "haskell" -> liftIO $ runghc r'
-              "java"    -> liftIO $ runJava r'
-              "mash"    -> liftIO $ runMash r'
+              "haskell" -> liftIO $ verifyProgram r' "haskell" inputs outputs
+              "java"    -> liftIO $ verifyProgram r' "java" inputs outputs
+              "mash"    -> liftIO $ verifyProgram r' "mash" inputs outputs
               _         -> return "Don't forget to choose a language."
   -}
-  -- And comment these ones out.
+  -- And comment these ones out. 
   let problem_name = "0001_Summation"
   (inputs, outputs) <- liftIO $ getProblemIO problem_name
   result <- case r' of
