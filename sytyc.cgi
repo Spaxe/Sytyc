@@ -159,30 +159,41 @@ verifyProgram source language inputs outputs = do
                    "java"    -> runJava
                    _         -> runMash -- Defaults to mash
   -- r <- verifyProgram' source compiler inputs outputs True
-  r <- verifyProgram' source compiler [(head inputs)] [(head outputs)] True
+  r <- verifyProgram' source compiler [(head inputs)] [(head outputs)] "" True
   let correctness = case r of
-                      True -> "Correct"
-                      _    -> (unlines inputs) ++ "\n\n" ++ (unlines outputs)
+                      "" -> "Correct!"
+                      _    -> r
   return correctness
     where
       verifyProgram' :: String
                      -> (String -> String -> IO String) 
                      -> [FilePath] 
                      -> [FilePath] 
-                     -> Bool 
-                     -> IO Bool
-      verifyProgram' _ _ _ _ False = return False
-      verifyProgram' _ _ [] _ correctness = return correctness
-      verifyProgram' _ _ _ [] correctness = return correctness
-      verifyProgram' source compiler (i:inputs) (o:outputs) correctness = do
+                     -> String
+                     -> Bool
+                     -> IO String
+      verifyProgram' _ _ _ _ msg False = return msg
+      verifyProgram' _ _ [] _ msg _ = return msg
+      verifyProgram' _ _ _ [] msg _ = return msg
+      verifyProgram' source compiler (i:inputs) (o:outputs) m correctness = do
         input <- exReadFile i
         let input' = strip input
         r <- rnf input' `seq` compiler source input'
         let r' = strip r
         answer <- exReadFile o
         let answer' = strip answer
-        verifyProgram' source compiler inputs outputs 
-                                              $ (r' == answer') && correctness 
+        let result = (r' == answer') && correctness
+        let msg = case result of 
+                    True -> ""
+                    _    -> "Incorrect result:\n"
+                            ++ r'
+                            ++ "\n\n"
+                            ++ "Expected result:\n"
+                            ++ answer'
+                            ++ "\n\n"
+                            ++ "Input used:\n"
+                            ++ input'
+        verifyProgram' source compiler inputs outputs msg result
       
       
 -- | Given a problem name, finds all of its test inputs and outputs and return
