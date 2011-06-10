@@ -9,7 +9,7 @@ Github repository: https://github.com/SpaXe/Sytyc
 
 Screenshot
 ----------
-![Sytyc Problem Sample Screen](https://github.com/SpaXe/Sytyc/raw/master/images/screenshot.png)
+![Sytyc Problem Sample Screen](https://github.com/SpaXe/Sytyc/raw/master/images/screenshot.jpg)
 
 Credits
 -------
