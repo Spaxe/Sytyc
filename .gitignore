@@ -1,8 +1,8 @@
 # Stuff we don't want to be version controlled.
 tmp/*
 !tmp/*.mashenv
-*.hi
-*.o
+src/*.hi
+src/*.o
 *.exe
-*.cgi
+./*.cgi
 *.class
