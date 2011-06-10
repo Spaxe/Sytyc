@@ -158,8 +158,8 @@ verifyProgram source language inputs outputs = do
                    "haskell" -> runghc
                    "java"    -> runJava
                    _         -> runMash -- Defaults to mash
-  -- r <- verifyProgram' source compiler inputs outputs True
-  r <- verifyProgram' source compiler [(head inputs)] [(head outputs)] "" True
+  r <- verifyProgram' source compiler inputs outputs "" True
+  -- r <- verifyProgram' source compiler [(head inputs)] [(head outputs)] "" True
   let correctness = case r of
                       "" -> "Correct!"
                       _    -> r
