@@ -105,7 +105,9 @@ runJava source input = do
                  runtime_msg = nToBR $ out_msg''
                                      ++ "\n" 
                                      ++ err_msg''
-           (_, _) -> return out_msg''
+           (_, _) -> do
+             removeFile $ replace ".java" ".class" tmpName
+             return out_msg''
   removeFile tmpName
   return msg
   
