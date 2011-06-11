@@ -69,7 +69,7 @@ Sytyc requires the following dependencies to be installed:
 \begin{verbatim}
 GHC 7.0.3       pandoc-1.8      missingH-1.1.0.3
 \end{verbatim}
-in addition to the \href{http://hackage.haskell.org/platform/}{Haskell Platform} (2011.2.0.1).  Sytyc has been tested on Windows 7 with XAMPP 1.7.4, compiled against the Haskell Platform of the version above.  The server must support CGI for Sytyc to function.
+in addition to the \href{http://hackage.haskell.org/platform/}{Haskell Platform} (2011.2.0.1).  Sytyc has been tested on Windows 7 64-bit with XAMPP 1.7.4, compiled against the Haskell Platform of the version above.  A compile-only test was run on Ubuntu 11.04 32-bit.  The server must support CGI for Sytyc to function.
 
 Move the Sytyc source code to a CGI-enabled folder.  The index page should be index.cgi.
 
@@ -138,5 +138,82 @@ place to learn programming.
 \end{verbatim}
 
 Note that hyperlinks is simply |[display-name](link)|. '|=|' denotes a |h1| in HTML-speak, while a '|-|' denotes a h2.  You don't have to recompile Sytyc if you modify these |.md| templates---they are parsed at run-time.
+
+\subsection{Adding and Changing Puzzles}
+
+Upon inspection of the |problems| folder, you will find a list of problems.  In each one, you will find:
+\begin{verbatim}
+description.md  input   output  Generator.mash  Solution.mash
+\end{verbatim}
+
+Both |input| and |output| contains files such as these:
+\begin{verbatim}
+01.txt  02.txt
+\end{verbatim}
+
+|description.md| is the markdown template for a puzzle's description, constraints, as well as sample input and output.  An example:
+\begin{verbatim}
+Summation
+=========
+Write a program that reads a list of integers, and prints the
+sum of all numbers read.
+
+Example Input
+-------------
+    1
+    4
+    6
+    6
+    3
+
+Example Output
+--------------
+    20
+    
+Constraints
+-----------
+*   Up to 1,000 integers could be supplied at once.
+
+*   Each integer will range between 0 and 1,000, inclusive.
+
+*   Your program must take no longer than 1 minute to execute.
+\end{verbatim}
+
+Note that lists are denoted by `|*|` followed by some whitespaces.  Similar to other markdown files, no re-compile is needed if this file is changed.  In addition, you can copy and paste the puzzles folder (i.e. |0001_Summation|) in the same folder, rename it, and Sytyc will pick it up as a new problem and list it on the webpage---all without the need to re-compile.  The problems are listed in lexical order.
+
+The |input| and |output| folders contain files that will be used to test a submitted program.  For example, |input/01.txt| is used to input to the program, with its output compared to |output/01.txt|, and so on.  They don't have particular naming constraints---Sytyc will parse through them all---but the names must be consistent between both folders.
+
+|Generator.mash| and |Solution.mash| are unused by Sytyc, but internally they were created to generate the input and output files.  This is currently a manual process.
+
+Test that you can add a new puzzle by duplicating a puzzle folder, rename it, and change its descrption as well as input and output.  Remember re-compile is not necessary to change the puzzles.
+\pagebreak
+\section{Sytyc.hs}
+Located in |src/Sytyc.hs|, it contains the common file-parsing functions as well as handling presentation logic.  All other source imports the module |Sytyc|.
+
+\subsection{Constants}
+\begin{tabular}{ l l }
+|prog_name| & Title of the webpage, as well as the name displayed on the homepage \\
+|version| & Sytyc software version
+|problem_dir| = "./problems/"
+|template_dir| = "./templates/"
+|tmp_dir| = "tmp" -- Do NOT add the slash at the end!
+
+|supported_languages| = [ "haskell"
+                      , "java"
+                      , "mash"
+                      ]
+                      
+|problem_file| = "description.md"
+                      
+|result_file| = "result.md"
+
+|template_html| = template_dir ++ "template.html"
+|problems_html| = template_dir ++ "problems.html"
+|problem_html| = template_dir ++ "problem.html"
+\end{tabular}
+
+\subsection{Methods}
+
+|parseTemplate|
 
 \end{document}

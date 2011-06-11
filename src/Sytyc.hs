@@ -39,7 +39,6 @@ import Data.List (delete, sort)
 -- Constants
 prog_name = "Sytyc - Programming Judge"
 version = "1.0"
-src_dir = "./test/"
 problem_dir = "./problems/"
 template_dir = "./templates/"
 tmp_dir = "tmp" -- Do NOT add the slash at the end!
