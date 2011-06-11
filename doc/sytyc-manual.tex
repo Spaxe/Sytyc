@@ -1,0 +1,48 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    urlcolor=red        % color of external links
+}
+
+\title{Sytyc-1.0}
+\author{Xavier Ho,\quad s2674674}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{\centering \small Abstract}
+
+\href{https://github.com/SpaXe/Sytyc}{Sytyc} is a web-based programming puzzles database with a compiler on the server side.  The web interface automatically parses the system sub-folders and generates a list of problems end-users can pick from.  The end-user solves the problem and submits some source code.  Then, Sytyc compiles and runs the code on the server, and checks if the program passes all tests.  Errors are reported directly on the webpage.  Successful programs will past all tests, and the end-user is congratulated.
+
+\section{Background}
+
+Originally started as "Judge", Sytyc was conceptualised to provide students an independent platform where they can test their programs, while solving puzzles with difficulties ranging from introductory to very difficult.  It also serves as a platform to train ICPC programming competition participants: format of the puzzles has been bulit similar to the competition format.  Sytyc archives puzzles by the subfolders in the file system, which is easy to backup and maintain.
+
+There are existing websites that have done an excellent job, such as \href{http://www.topcoder.com/}{TopCoder} and \href{http://projecteuler.net/}{ProjectEuler}.  Sytyc is an attempt to recreate some features from these sites in order to customise the types of problems in the database, appropariate for the target programmers at Griffith University.  In addition, Sytyc supports Andrew Rock's \href{http://www.ict.griffith.edu.au/arock/MaSH/index.html}{MaSH} compiler, which is consistent with the offering with the introductory programming course on Nathan campus.
+
+\section{Installation}
+
+This installation guide assumes the reader is familiar with basic Unix commands and its operating system envorinment.
+
+\subsection{Checking out the source code}
+
+If, for some reason, the source code was not provided along with the manual, you can always obtain the latest version of Sytyc at its  \href{https://github.com/SpaXe/Sytyc}{Github repository}.
+
+If you're not a Git user, download and install \href{http://git-scm.com/}{Git}.  Open up a terminal and check out the soure code with:
+\begin{verbatim}
+git clone git@github.com:SpaXe/Sytyc.git
+\end{verbatim}
+
+\subsection{Compiling the source code}
+
+Sytyc requires the following dependencies to be installed:
+\begin{verbatim}
+GHC 7.0.3       pandoc-1.8      missingH-1.1.0.3
+\end{verbatim}
+in addition to the \href{http://hackage.haskell.org/platform/}{Haskell Platform} (2011.2.0.1).  Sytyc has been tested on Windows 7 with XAMPP 1.7.4, compiled against the Haskell Platform of the version above.  The server must support CGI for Sytyc to function.
+
+\end{document}
