@@ -10,7 +10,7 @@ Whatever the reason is, welcome.
 Get Started
 -----------
 If you're a first-timer,
-[check out the list of problems here](problems.cgi). Get your 
+[check out the list of problems here](problem_list.cgi). Get your 
 compiler or interpreter and your favourite IDE ready, and start coding.
 All problems use the standard output for printing, and standard input for
 reading.

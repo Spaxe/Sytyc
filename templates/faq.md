@@ -7,7 +7,7 @@ Currently, only the [MaSH](http://www.ict.griffith.edu.au/arock/MaSH/index.html)
 
 Where are the puzzles?
 ----------------------
-They're on the [Problems](problems.cgi) page.
+They're on the [Problems](problem_list.cgi) page.
 
 What kind of puzzles are there?
 -------------------------------
