@@ -23,7 +23,7 @@ import Sytyc
 -- Edit this section with care. Chances are, more things break if changed.
 
 -- Haskell
-runghc :: String -> String -> IO (String, ExitCode)
+runghc :: String -> String -> IO String
 runghc source input = do
   createDirectoryIfMissing False tmp_dir
   (tmpName, tmpHandle) <- openTempFile tmp_dir "Main.hs"
@@ -42,15 +42,15 @@ runghc source input = do
                                          ++ "\n"
                                          ++ err_msg)      
   removeFile tmpName
-  return (msg, exitcode)
+  return msg
   
 -- Java
 -- The source code must have "public class Main".
 -- Pain in the ass.
 -- "why do you hate your sanity?" ~ Nick Hodge, Microsoft Australia
-runJava :: String -> String -> IO (String, ExitCode)
+runJava :: String -> String -> IO String
 -- Java does not generate .class files if the source is empty. Annoying.
-runJava "" _ = return ("", ExitSuccess)
+runJava "" _ = return ""
 runJava source input = do
   createDirectoryIfMissing False tmp_dir
   (tmpName, tmpHandle) <- openTempFile tmp_dir "Main.java"
@@ -109,11 +109,11 @@ runJava source input = do
              removeFile $ replace ".java" ".class" tmpName
              return out_msg''
   removeFile tmpName
-  return (msg, exitcode')
+  return msg
   
 
 -- | Runs a Mash program. Delegates most of the work to runJava.
-runMash :: String -> String -> IO (String, ExitCode)
+runMash :: String -> String -> IO String
 runMash source input = do
   createDirectoryIfMissing False tmp_dir
   (tmpName, tmpHandle) <- openTempFile tmp_dir "Main.mash"
@@ -150,13 +150,13 @@ runMash source input = do
                                         ++ err_msg
            ExitSuccess -> do
              java_source <- exReadFile $ replace ".mash" ".java" tmpName 
-             (r, e) <- runJava 
+             r <- runJava 
                (replace ("class " ++ className') "class Main" java_source)
                input
              removeFile $ replace ".mash" ".java" tmpName
              return r
   removeFile tmpName
-  return (msg, exitcode)
+  return msg
   
 ------------------------------------------------------------------
 -- Verify program's correctness
@@ -174,7 +174,7 @@ verifyProgram source language inputs outputs = do
   return correctness
     where
       verifyProgram' :: String
-                     -> (String -> String -> IO (String, ExitCode)) 
+                     -> (String -> String -> IO String) 
                      -> [FilePath] 
                      -> [FilePath] 
                      -> String
@@ -186,21 +186,21 @@ verifyProgram source language inputs outputs = do
       verifyProgram' source compiler (i:inputs) (o:outputs) m correctness = do
         input <- exReadFile i
         let input' = strip input
-        (r, exitcode) <- compiler source input'
+        r <- compiler source input'
         let r' = strip r
         answer <- exReadFile o
         let answer' = strip answer
         let result = (r' == answer') && correctness
-        msg <- case (result, exitcode) of 
-                    (_, ExitSuccess) -> return $ "Incorrect.\n\nYour result:\n"
-                                      ++ r'
-                                      ++ "\n\n"
-                                      ++ "Expected result:\n"
-                                      ++ answer'
-                                      ++ "\n\n"
-                                      ++ "Input used:\n"
-                                      ++ input'
-                    (_, ExitFailure a) -> return r'
+        let msg = case result of 
+                    True -> ""
+                    _    -> "Incorrect.\n\nYour result:\n"
+                            ++ r'
+                            ++ "\n\n"
+                            ++ "Expected result:\n"
+                            ++ answer'
+                            ++ "\n\n"
+                            ++ "Input used:\n"
+                            ++ input'
         verifyProgram' source compiler inputs outputs msg result
       
       
