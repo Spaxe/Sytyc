@@ -191,29 +191,29 @@ Test that you can add a new puzzle by duplicating a puzzle folder, rename it, an
 Located in |src/Sytyc.hs|, it contains the common file-parsing functions as well as handling presentation logic.  All other source imports the module |Sytyc|.
 
 \subsection{Constants}
-\begin{tabular}{ l l }
-|prog_name| & Title of the webpage, as well as the name displayed on the homepage \\
-|version| & Sytyc software version
-|problem_dir| = "./problems/"
-|template_dir| = "./templates/"
-|tmp_dir| = "tmp" -- Do NOT add the slash at the end!
-
-|supported_languages| = [ "haskell"
-                      , "java"
-                      , "mash"
-                      ]
-                      
-|problem_file| = "description.md"
-                      
-|result_file| = "result.md"
-
-|template_html| = template_dir ++ "template.html"
-|problems_html| = template_dir ++ "problems.html"
-|problem_html| = template_dir ++ "problem.html"
+\begin{tabular}{ p{1.5in}p{3in} }
+|prog_name| & Title of the webpage, as well as the name displayed on the homepage. \\
+|version| & Sytyc software version. \\
+|problem_dir| & Directory where the puzzles are located. \\
+|template_dir| & Directory where the HTML and markdown templates are located. \\
+|tmp_dir| & Directory where temporary source code is stored for compilation at run-time. \\
+|supported_languages| & Supported languages that run on Sytyc;  Currently, only MaSH is. \\
+|problem_file| & File name for the puzzle description template. \\
+|result_file| & File name for the puzzle submission result template. \\
+|template_html| & File path for |template.html|. \\
+|problems_html| & File path for |problems.html|. \\
+|problem_html| & File path for |problem.html|.
 \end{tabular}
 
 \subsection{Methods}
+The following is a list of methods found in Sytyc module. \\
 
-|parseTemplate|
+|parseTemplate :: [(String, String)] -> String -> IO String|
+\vskip 0.1in
+Synonym for Pandoc's renderTemplate.  Takes a list of string (|key|, |value|) pairs, and a string to be parsed. For every match of the |key| (wrapped in |$| sign in the template), it will be replaced by the |value|.  Returns the newly replaced string.\\
+
+|exReadFile :: FilePath -> IO String|
+\vskip 0.1in
+Takes a |path| of a file, reads it, and returns the content of the file with error handling.
 
 \end{document}
