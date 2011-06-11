@@ -9,7 +9,9 @@ BIN = index problem problem_list faq feedback
 all: $(BIN)
 
 install:
-	mv $(BIN) ../
+	for binary in $(BIN) ; do \
+	  mv $$binary ../$$binary.cgi ; \
+	done
 
 .hs:
 	$(CC) $(FLAGS) $<
