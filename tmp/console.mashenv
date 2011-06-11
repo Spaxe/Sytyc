@@ -1,6 +1,6 @@
 /*
 ** file:     console.mashenv
-** modified: Mon Jun 14 09:54:58 EST 2010
+** modified: Sun May 22 16:12:08 EST 2011
 ** author:   Andrew Rock
 */
 
@@ -14,6 +14,10 @@ environment console {
    private class {
       purpose <#
          The code must be wrapped in a class declaration.
+      #><#
+         There are no imports. Imports are BAD, as they cause name collisions
+         with student program names that drive the students and tutors crazy
+         trying to figure out.
       #>
       prelude {#
          public class #PROGRAM_NAME# {
@@ -23,7 +27,7 @@ environment console {
       #}
    }
    
-   public rewrite void main() {
+   public mandatory rewrite void main() {
       purpose <#
          A program that is organised into methods must have a {\tt main} method
          (a procedure with no arguments). This will be the first method to
@@ -81,7 +85,7 @@ environment console {
             mash_console_scanner.nextInt()
          #}
       }
-      
+
       public long readLong() {
          purpose <#
             Returns the next long from standard input.
@@ -94,7 +98,7 @@ environment console {
             mash_console_scanner.nextLong()
          #}
       }
-      
+
       public boolean readBoolean() {
          purpose <#
             Returns the next boolean from standard input.
@@ -445,6 +449,16 @@ environment console {
          #}
       }
 
+      public double exp(double x) {
+         purpose <# 
+            Returns $e^x$, that is Euler's constant $e$ raised to power
+            $x$.
+         #> 
+         inline {#
+            java.lang.Math.exp(#x#)
+         #}
+      }
+
       public double floor(double a) {
          purpose <# 
             Returns the greatest double value that is less than or equal to
@@ -452,6 +466,15 @@ environment console {
          #>
          inline {#
             java.lang.Math.floor(#a#)
+         #}
+      }
+
+      public double log(double x) {
+         purpose <# 
+            Returns the natural logarithm of $x$.
+         #> 
+         inline {#
+            java.lang.Math.log(#x#)
          #}
       }
    
@@ -665,6 +688,115 @@ environment console {
          #>
         inline {#
            #a#.equals(#b#)
+         #}
+      }
+
+      public String format(boolean p, int w) {
+         purpose <# 
+            Returns {\tt p} converted to a string, padded with spaces to a
+            minimum width \textbar{\tt w}\textbar. If {\tt w} is negative, the result is 
+            left-justified, otherwise right-justified.
+         #>
+         inline {#
+            java.lang.String.format("%" + (#w#) + "b",
+               new java.lang.Boolean(#p#))
+         #}
+      }
+
+      public String format(char c, int w) {
+         purpose <# 
+            Returns {\tt c} converted to a string, padded with spaces to a
+            minimum width \textbar{\tt w}\textbar. If {\tt w} is negative, the result is 
+            left-justified, otherwise right-justified.
+         #>
+         inline {#
+            java.lang.String.format("%" + (#w#) + "c",
+               new java.lang.Character(#c#))
+         #}
+      }
+
+      public String format(double d, int w, char f, int p) {
+         purpose <# 
+            Returns {\tt d} converted to a string, padded with spaces to a
+            minimum width \textbar {\tt w}\textbar. If {\tt w} is negative, the result is 
+            left-justified, otherwise right-justified. {\tt f} controls the
+            format: {\tt 'e'} selects scientific notation; {\tt 'f'} selects
+            fixed point; or {\tt 'g'} selects the best format depending on the
+            number and {\tt p}. {\tt p} is the number of decimal digits
+            to display after the decimal point.
+         #>
+         inline {#
+            java.lang.String.format("%" + (#w#) + "." + (#p#) + (#f#), 
+               new Double(#d#))
+         #}
+      }
+
+      public String format(long l, int w) {
+         purpose <# 
+            Returns {\tt l} converted to a string, padded with spaces to a
+            minimum width \textbar{\tt w}\textbar. If {\tt w} is negative, the result is 
+            left-justified, otherwise right-justified.
+         #>
+         inline {#
+            java.lang.String.format("%" + (#w#) + "d",
+               new java.lang.Long(#l#))
+         #}
+      }
+
+      public String format(String s, int w) {
+         purpose <# 
+            Returns {\tt s} padded with spaces to a minimum width \textbar{\tt w}\textbar. 
+            If {\tt w} is negative, the result is left-justified, otherwise
+            right-justified.
+         #>
+         inline {#
+            java.lang.String.format("%" + (#w#) + "s",
+               #s#)
+         #}
+      }
+
+      public boolean parseBoolean(String s) {
+         purpose <# 
+            Returns {\tt s} converted to a {\tt boolean}.
+         #>
+         inline {#
+            java.lang.Boolean.parseBoolean(#s#)
+         #}
+      }
+
+      public int parseInt(String s) {
+         purpose <# 
+            Returns {\tt s} converted to an {\tt int}.
+         #>
+         inline {#
+            java.lang.Integer.parseInt(#s#)
+         #}
+      }
+
+      public long parseLong(String s) {
+         purpose <# 
+            Returns {\tt s} converted to a {\tt long}.
+         #>
+         inline {#
+            java.lang.Long.parseLong(#s#)
+         #}
+      }
+
+      public float parseFloat(String s) {
+         purpose <# 
+            Returns {\tt s} converted to a {\tt float}.
+         #>
+         inline {#
+            java.lang.Float.parseFloat(#s#)
+         #}
+      }
+
+      public double parseDouble(String s) {
+         purpose <# 
+            Returns {\tt s} converted to a {\tt double}.
+         #>
+         inline {#
+            java.lang.Double.parseDouble(#s#)
          #}
       }
 
