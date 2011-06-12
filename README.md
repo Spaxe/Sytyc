@@ -21,7 +21,7 @@ And other Functional Programming classmates.
 
 Installation & Usage
 --------------------
-@TODO
+See the documentation inside `doc` folder.
 
 Sytyc is not thread-safe. You should not compile and run it with -thread flag.
 
@@ -45,10 +45,6 @@ Other dependencies:
   * Java SDK SE 6
   
   * MaSH compiler http://www.ict.griffith.edu.au/arock/MaSH/index.html
-
-Customisation
--------------
-@TODO
 
 License
 -------
