@@ -214,6 +214,57 @@ Synonym for Pandoc's renderTemplate.  Takes a list of string (|key|, |value|) pa
 
 |exReadFile :: FilePath -> IO String|
 \vskip 0.1in
-Takes a |path| of a file, reads it, and returns the content of the file with error handling.
+Takes a |path| of a file, reads it, and returns the content of the file with error handling.\\
+
+|parseTemplateFile :: [(String, String)] -> FilePath -> IO String|
+\vskip 0.1in
+Equivalent to |parseTemplate|, except the second argument is a |path| to a file that will be opened for reading using |exReadFile|.\\
+
+|parseMarkdownFile :: FilePath -> IO String|
+\vskip 0.1in
+Takes a |path| to a markdown (|.md|) file, and returns its HTML translation.\\\pagebreak
+
+|parseResultTemplate :: String -> IO String|
+\vskip 0.1in
+Takes the string and inserts it into the result template. Returns the result in HTML.\\
+
+|nToBR :: String -> String|
+\vskip 0.1in
+Replaces the |\n| in the input string with |<br>|.\\
+
+|getProblemList :: IO [String]|
+\vskip 0.1in
+Returns a list of problem names.\\
+
+|build_time :: IO String|
+\vskip 0.1in
+Returns the current system time.\\
+
+|footer_text :: IO String|
+\vskip 0.1in
+Returns the footer text in the webpage.
 
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

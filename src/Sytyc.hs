@@ -6,7 +6,6 @@ module Sytyc
   , parseMarkdownFile
   , parseResultTemplate
   , nToBR
-  , src_dir
   , problem_dir
   , template_dir
   , tmp_dir
@@ -77,14 +76,14 @@ exReadFile f =
 -- | file to be opened for parsing. Returns the template with the variables
 -- | substituted. Variables should be wrapped with $ signs, like $this$.
 -- | For more information, consult pandoc's renderTemplate documentation.
-parseTemplateFile :: [(String, String)] -> String -> IO String
+parseTemplateFile :: [(String, String)] -> FilePath -> IO String
 parseTemplateFile template_strings template = do
   t <- exReadFile template
   return $ parseTemplate template_strings t
   
   
 -- | Takes a markdown template, and outputs HTML.
-parseMarkdownFile :: String -> IO String
+parseMarkdownFile :: FilePath -> IO String
 parseMarkdownFile mdFile = do
   file <- exReadFile mdFile
   return $ writeHtmlString defaultWriterOptions 
