@@ -69,9 +69,9 @@ Sytyc requires the following dependencies to be installed:
 \begin{verbatim}
 GHC 7.0.3       pandoc-1.8      missingH-1.1.0.3
 \end{verbatim}
-in addition to the \href{http://hackage.haskell.org/platform/}{Haskell Platform} (2011.2.0.1).  Sytyc has been tested on Windows 7 64-bit with XAMPP 1.7.4, compiled against the Haskell Platform of the version above.  A compile-only test was run on Ubuntu 11.04 32-bit.  The server must support CGI for Sytyc to function.
+in addition to the \href{http://hackage.haskell.org/platform/}{Haskell Platform} (2011.2.0.1).  Sytyc has been tested on Windows 7 64-bit with XAMPP 1.7.4, compiled against the Haskell Platform of the version above.  A compile-only test was run on Ubuntu 11.04 32-bit.  The server must support CGI for Sytyc to function.  
 
-Move the Sytyc source code to a CGI-enabled folder.  The index page should be index.cgi.
+Move the Sytyc source code to a CGI-enabled folder.  The index page in your server settings should be index.cgi.
 
 If you're on Windows, in the main folder of Sytyc simply type
 \begin{verbatim}
@@ -181,6 +181,8 @@ Constraints
 
 Note that lists are denoted by `|*|` followed by some whitespaces.  Similar to other markdown files, no re-compile is needed if this file is changed.  In addition, you can copy and paste the puzzles folder (i.e. |0001_Summation|) in the same folder, rename it, and Sytyc will pick it up as a new problem and list it on the webpage---all without the need to re-compile.  The problems are listed in lexical order.
 
+Sample input and output are indented by 4 spaces. This puts them inside |<code>| in the result HTML for styling.
+
 The |input| and |output| folders contain files that will be used to test a submitted program.  For example, |input/01.txt| is used to input to the program, with its output compared to |output/01.txt|, and so on.  They don't have particular naming constraints---Sytyc will parse through them all---but the names must be consistent between both folders.
 
 |Generator.mash| and |Solution.mash| are unused by Sytyc, but internally they were created to generate the input and output files.  This is currently a manual process.
@@ -226,7 +228,7 @@ Takes a |path| to a markdown (|.md|) file, and returns its HTML translation.\\\p
 
 |parseResultTemplate :: String -> IO String|
 \vskip 0.1in
-Takes the string and inserts it into the result template. Returns the result in HTML.\\
+Takes the string and inserts it into the result template.  Returns the result in HTML.\\
 
 |nToBR :: String -> String|
 \vskip 0.1in
@@ -243,6 +245,66 @@ Returns the current system time.\\
 |footer_text :: IO String|
 \vskip 0.1in
 Returns the footer text in the webpage.
+
+\section{Specific Methods}
+
+|problem.hs| contains the routines that call the compilers, and provides a simple CGI to interface with the web browser.
+
+\subsection{Methods}
+
+The following is a list of methods used in Sytyc.\\
+
+|runJava :: String -> String -> IO (String, ExitCode)|
+\vskip 0.1in
+Takes some Java |source| code and a string to be redirected into standard |input|.  Returns a tuple of the |output| and the exit |code|.\\
+
+|runMash :: String -> String -> IO (String, ExitCode)|
+\vskip 0.1in
+Takes some MaSH |source|code and a string to be redirected into standard input.   Returns a tuple of the |output| and the exit |code|.\\
+
+|verifyProgram :: String -> String -> [FilePath] -> [FilePath]|\\
+|                 -> IO String|
+\vskip 0.1in
+Takes some |source| code, |langauge| of the program, a list of |inputs| and |outputs|.  Returns a message to the user saying if their program was successful or not. \\
+
+|getProblemIO :: String -> IO ([FilePath], [FilePath])|
+\vskip 0.1in
+Takes the |name| of the problem, and returns a tuple of lists of its |inputs| and |outputs|.\\\pagebreak
+
+\subsection{Common Methods}
+
+|cgiMain :: CGI CGIResult|
+\vskip 0.1in
+Handles the front controller logic.  This method's implmentation is different from file to file.
+
+\subsection{Unused Methods}
+
+|runghc :: String -> String -> IO (String, ExitCode)|
+\vskip 0.1in
+{\em Warning: Untested at integration stage.}
+
+Takes some Haskell |source|code and a string to be redirected into standard input.   Returns a tuple of the |output| and the exit |code|.
+
+\section{Limitations and Issues}
+
+Sytyc works on the basis which the program must be: 1) written in MaSH; 2) uses the |console| environment; 3) runs in finite time.  While it does have Java and Haskell support, they are not available to end-users for security reasons.  This security issue is a solved problem but not implemented in Sytyc.  In addition, the current |runMash| function does not impose a timeout limit on the program; the result of an never-ending program is undefined.
+
+Currently, there is no mechanism to automate puzzle generations. All puzzles must be manually created, written, and supplied.  The input and output files are also static files; no random number generation is currently set to test if the input solution is robust.  Partially this was due to the fact that File I/O is very expensive, and generating multiple files per user did not seem feasible.  A possible solution might be to provide an input test directly in the source, but this was unexplored.
+
+Haskell's static linking cause the compiled binary to be above 10MB.  As a web-service this seems unacceptable, especially when one considers the fact that exactly the same libraries are linked and copied to each |.cgi| file.  However this will not cause the website to slow down since the executable is only run on the server, and only the result string is sent to the client.  Nonetheless, the size of the binaries is too big and a problem native to Haskell.
+
+In terms of software design, I felt the program could have been written with more structure, e.g, using Haskell's typeclass system more, and create a flexible program.  The current stage is a working prototype.  While it does provide the benefit of no-need-to-recompile when one wishes to add or modify its contents, its extensibility is rather limited by design.
+
+\section{Course-related comments}
+I learned a lot about Haskell, and this is wonderful news.  However, I also felt that the assignments were unfortunately restricted to the course environment, and not much Haskell design was explored as a main goal.  In particular, the assignments felt they should have been for a project-based course (similar to the Third Year Project, or an Advanced Studies project) rather than a research-based course.  The workload per assignment, in my own estimates, was at least 60 hours each, which is longer than desired.
+
+Instead, I would suggest that the assignments should be more focused on langauge practice and function design.  The practice sheets that were given in the first half of the course were very useful.  I would like to see more of them---they got me thinking harder than the assignments, which felt like a big hack in the end.  
+
+Aside from that, it was defintiely a very solid course, and I thoroughly enjoyed it.  I would recommend anyone interested in functional languages to take it.
+
+\section{Contact information}
+
+You can reach Xavier at \href{mailto:contact@xavierho.com}{contact@xavierho.com}.
 
 \end{document}
 
